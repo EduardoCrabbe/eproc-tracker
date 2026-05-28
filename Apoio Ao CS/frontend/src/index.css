@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-navy: #001A41;
+  --color-brand-gold: #D4AF37;
+  --color-brand-bronze: #8B6D45;
+  --color-brand-cream: #FDFCF8;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-cream text-brand-navy font-sans antialiased;
+  }
+}

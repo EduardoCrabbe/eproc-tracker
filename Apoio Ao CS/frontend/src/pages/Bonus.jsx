@@ -1,0 +1,123 @@
+import React, { useState } from 'react';
+import { PlusCircle, Star, MessageSquare, Image as ImageIcon, Video, History } from 'lucide-react';
+
+export default function Bonus() {
+  const [extrato, setExtrato] = useState([
+    { data: '27/05/2026', cliente: 'João da Silva Santos', tipo: 'Comentário/Quitação', valor: 5.00 },
+    { data: '26/05/2026', cliente: 'Maria Oliveira', tipo: 'Vídeo Depoimento', valor: 15.00 }
+  ]);
+
+  const [form, setForm] = useState({ cliente: '', tipo: 'ComentarioQuitacao' });
+
+  const tiposBonus = [
+    { id: 'ComentarioQuitacao', label: 'Comentário / Quitação', icon: MessageSquare },
+    { id: 'ReclameAqui', label: 'Elogio no Reclame Aqui', icon: Star },
+    { id: 'FotoBoleto', label: 'Foto com Boleto Pago', icon: ImageIcon },
+    { id: 'VideoDepoimento', label: 'Vídeo Depoimento', icon: Video }
+  ];
+
+  const handleLancamento = (e) => {
+    e.preventDefault();
+    if (!form.cliente) return;
+    
+    // Simulating frontend adding to extrato (Mocking API call)
+    setExtrato([
+      { data: new Date().toLocaleDateString('pt-BR'), cliente: form.cliente, tipo: form.tipo, valor: 0 },
+      ...extrato
+    ]);
+    setForm({ ...form, cliente: '' });
+  };
+
+  return (
+    <div className="space-y-8">
+      <header>
+        <h2 className="text-3xl font-bold text-brand-navy">Bônus & Comissões</h2>
+        <p className="text-brand-bronze mt-1">Lançamento manual de comissões por metas alcançadas (Níveis 1 a 5).</p>
+      </header>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-brand-navy p-6 rounded-2xl shadow-xl text-white">
+            <h3 className="text-lg font-bold border-b border-white/10 pb-4 mb-4 flex items-center gap-2">
+              <PlusCircle className="w-5 h-5 text-brand-gold" />
+              Novo Lançamento
+            </h3>
+            <form onSubmit={handleLancamento} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-1">ID ou Nome do Cliente</label>
+                <input 
+                  type="text" 
+                  value={form.cliente}
+                  onChange={e => setForm({...form, cliente: e.target.value})}
+                  className="w-full bg-white/5 border border-white/20 rounded-lg p-2.5 text-white placeholder-white/30 focus:outline-none focus:border-brand-gold transition-colors"
+                  placeholder="Ex: 1002345..."
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">Tipo de Bônus</label>
+                <div className="space-y-2">
+                  {tiposBonus.map((tipo) => (
+                    <label key={tipo.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${form.tipo === tipo.id ? 'bg-brand-gold/20 border-brand-gold text-white' : 'border-white/10 text-white/60 hover:bg-white/5'}`}>
+                      <input 
+                        type="radio" 
+                        name="tipoBonus" 
+                        value={tipo.id} 
+                        checked={form.tipo === tipo.id}
+                        onChange={() => setForm({...form, tipo: tipo.id})}
+                        className="hidden"
+                      />
+                      <tipo.icon className={`w-4 h-4 ${form.tipo === tipo.id ? 'text-brand-gold' : ''}`} />
+                      <span className="text-sm font-medium">{tipo.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <button type="submit" className="w-full bg-brand-gold hover:bg-[#b8952b] text-brand-navy font-bold py-3 rounded-xl transition-colors shadow-lg mt-4">
+                Registrar Bônus
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
+            <div className="p-6 border-b border-slate-100 flex items-center gap-2">
+              <History className="w-5 h-5 text-brand-bronze" />
+              <h3 className="text-xl font-bold text-brand-navy">Extrato de Ganhos Extras</h3>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-brand-cream border-y border-slate-100 text-brand-bronze text-xs uppercase tracking-wider">
+                    <th className="px-6 py-3 font-bold">Data</th>
+                    <th className="px-6 py-3 font-bold">Cliente</th>
+                    <th className="px-6 py-3 font-bold">Ação Realizada</th>
+                    <th className="px-6 py-3 font-bold text-right">Valor (R$)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {extrato.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-sm text-slate-500">{item.data}</td>
+                      <td className="px-6 py-4 text-sm font-bold text-brand-navy">{item.cliente}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{item.tipo}</td>
+                      <td className="px-6 py-4 text-sm font-bold text-emerald-600 text-right">
+                        {item.valor > 0 ? `+ R$ ${item.valor.toFixed(2)}` : 'Em proc.'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {extrato.length === 0 && (
+                <div className="p-8 text-center text-slate-400">Nenhum ganho extra registrado ainda.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

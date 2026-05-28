@@ -1,0 +1,301 @@
+import React, { useState, useEffect } from 'react';
+import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, User } from 'lucide-react';
+
+export default function AreaCS() {
+  const [clientes, setClientes] = useState([
+    { id: '1002345-67', nome: 'Eduardo Crabbe', uf: 'SP', contrato: 'Veículo', processos: 'Sim', criticidade: 'Crítico', contatos: 0, status: 'Ativo', ultimoContato: null },
+    { id: '1002346-68', nome: 'Ana Souza', uf: 'RJ', contrato: 'Empréstimo', processos: 'Não', criticidade: 'Atenção', contatos: 2, status: 'Ativo', ultimoContato: Date.now() - (70 * 60 * 60 * 1000) },
+    { id: '1002347-69', nome: 'Carlos Silva', uf: 'MG', contrato: 'Veículo', processos: 'Não', criticidade: 'Regular', contatos: 5, status: 'Ativo', ultimoContato: null },
+  ]);
+
+  const [busca, setBusca] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('Todos');
+  const [now, setNow] = useState(Date.now());
+  
+  const [modalQuitar, setModalQuitar] = useState(null);
+  const [datasQuitar, setDatasQuitar] = useState({ dataBoleto: '', dataPagamento: '' });
+
+  // Atualizar o relógio para os timers
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60000); // Atualiza a cada 1 minuto
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleAtendimento = (id) => {
+    setClientes(clientes.map(c => {
+      if (c.id === id && c.contatos < 6) {
+        return { ...c, contatos: c.contatos + 1, ultimoContato: Date.now() };
+      }
+      return c;
+    }));
+  };
+
+  const confirmarQuitar = (e) => {
+    e.preventDefault();
+    if (!datasQuitar.dataBoleto || !datasQuitar.dataPagamento) return;
+    
+    setClientes(clientes.map(c => {
+      if (c.id === modalQuitar.id) {
+        return { ...c, status: 'Quitado', dataBoleto: datasQuitar.dataBoleto, dataPagamento: datasQuitar.dataPagamento };
+      }
+      return c;
+    }));
+    setModalQuitar(null);
+    setDatasQuitar({ dataBoleto: '', dataPagamento: '' });
+  };
+
+  const handleChangeField = (id, field, valor) => {
+    setClientes(clientes.map(c => {
+      if (c.id === id) {
+        return { ...c, [field]: valor };
+      }
+      return c;
+    }));
+  };
+
+  // Filtrar por Status, Busca Rápida (Nome/ID) e Tipo
+  const clientesVisiveis = clientes.filter(c => {
+    if (c.status !== 'Ativo') return false;
+    if (filtroTipo !== 'Todos' && c.contrato !== filtroTipo) return false;
+    
+    if (busca) {
+      const termo = busca.toLowerCase();
+      if (!c.nome.toLowerCase().includes(termo) && !c.id.toLowerCase().includes(termo)) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const getCriticidadeStyle = (nivel) => {
+    if (nivel === 'Crítico') return 'bg-red-50 text-red-700 border-red-200';
+    if (nivel === 'Atenção') return 'bg-amber-50 text-amber-700 border-amber-200';
+    return 'bg-blue-50 text-blue-700 border-blue-200'; // Regular
+  };
+
+  return (
+    <div className="space-y-6 pb-12 relative">
+      <header className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold text-brand-navy">Meus Clientes</h2>
+          <p className="text-brand-bronze mt-1">Gerencie sua lista, filtre contratos e registre atendimentos.</p>
+        </div>
+        <div className="flex gap-3">
+          <button className="bg-white border border-slate-200 text-brand-navy px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 flex items-center gap-2 transition-colors">
+            <UploadCloud className="w-5 h-5 text-brand-bronze" />
+            Importar Planilha
+          </button>
+          <button className="bg-brand-navy text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-blue-900 flex items-center gap-2 transition-colors">
+            <Plus className="w-5 h-5 text-brand-gold" />
+            Adicionar Cliente
+          </button>
+        </div>
+      </header>
+      
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        
+        {/* Barra de Filtros e Busca Rápida */}
+        <div className="p-4 border-b border-slate-100 bg-slate-50 flex flex-col md:flex-row items-center gap-4">
+          <div className="flex-1 w-full relative">
+            <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="Localização Rápida (Nome ou ID)..." 
+              value={busca}
+              onChange={e => setBusca(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-brand-navy shadow-sm transition-colors"
+            />
+          </div>
+          
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <Filter className="w-4 h-4 text-brand-bronze" />
+            <select 
+              value={filtroTipo}
+              onChange={e => setFiltroTipo(e.target.value)}
+              className="w-full md:w-auto text-sm border border-slate-200 rounded-lg p-2.5 text-slate-700 bg-white focus:outline-none focus:border-brand-navy shadow-sm cursor-pointer"
+            >
+              <option value="Todos">Filtrar por: Todos os Tipos</option>
+              <option value="Veículo">Apenas Veículo</option>
+              <option value="Empréstimo">Apenas Empréstimo</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
+            <thead>
+              <tr className="bg-brand-cream border-b border-slate-100 text-brand-bronze text-xs uppercase tracking-wider">
+                <th className="px-4 py-4 font-bold">ID DataJuri</th>
+                <th className="px-4 py-4 font-bold">Nome do Cliente</th>
+                <th className="px-4 py-4 font-bold">Criticidade</th>
+                <th className="px-4 py-4 font-bold">Contrato / Proc.</th>
+                <th className="px-4 py-4 font-bold text-center">Cliente Atendido</th>
+                <th className="px-4 py-4 font-bold text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {clientesVisiveis.map((cliente) => {
+                
+                // Lógica do Timer de 72h
+                let isBlocked = false;
+                let timerDisplay = null;
+                
+                if (cliente.contatos >= 6) {
+                  isBlocked = true;
+                  timerDisplay = "Limite atingido";
+                } else if (cliente.ultimoContato) {
+                  const diffMs = now - cliente.ultimoContato;
+                  const diffHoras = diffMs / (1000 * 60 * 60);
+                  
+                  if (diffHoras < 72) {
+                    isBlocked = true;
+                    const horasRestantes = Math.floor(72 - diffHoras);
+                    const minRestantes = Math.floor(((72 - diffHoras) * 60) % 60);
+                    timerDisplay = `${horasRestantes}h ${minRestantes}m`;
+                  }
+                }
+
+                // Row background highlight for critical clients
+                const isCritical = cliente.criticidade === 'Crítico';
+
+                return (
+                  <tr key={cliente.id} className={`transition-colors ${isCritical ? 'bg-red-50/30 hover:bg-red-50/60' : 'hover:bg-slate-50'}`}>
+                    <td className="px-4 py-4 text-sm font-medium text-slate-500">{cliente.id}</td>
+                    <td className="px-4 py-4">
+                      <div className={`text-sm font-bold flex items-center gap-2 ${isCritical ? 'text-red-700' : 'text-brand-navy'}`}>
+                        {cliente.nome}
+                        {isCritical && <AlertOctagon className="w-3.5 h-3.5 text-red-500" />}
+                      </div>
+                      <div className="text-xs text-slate-400 mt-0.5">{cliente.uf}</div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <select 
+                        value={cliente.criticidade}
+                        onChange={(e) => handleChangeField(cliente.id, 'criticidade', e.target.value)}
+                        className={`text-xs border rounded-lg p-1.5 focus:outline-none cursor-pointer font-bold transition-colors shadow-sm ${getCriticidadeStyle(cliente.criticidade)}`}
+                      >
+                        <option value="Crítico">Crítico (Semanal)</option>
+                        <option value="Atenção">Atenção (Quinzenal)</option>
+                        <option value="Regular">Regular (Mensal)</option>
+                      </select>
+                    </td>
+                    <td className="px-4 py-4 space-y-1">
+                      <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${cliente.contrato === 'Veículo' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-slate-100 text-slate-700 border-slate-200'}`}>
+                        {cliente.contrato}
+                      </div>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="text-[10px] font-medium text-slate-500 uppercase">Processo:</span>
+                        <select 
+                          value={cliente.processos}
+                          onChange={(e) => handleChangeField(cliente.id, 'processos', e.target.value)}
+                          className={`text-[10px] border rounded p-0.5 focus:outline-none cursor-pointer font-bold ${cliente.processos === 'Sim' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-emerald-700 bg-emerald-50 border-emerald-200'}`}
+                        >
+                          <option value="Sim">Sim</option>
+                          <option value="Não">Não</option>
+                        </select>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <button 
+                        onClick={() => handleAtendimento(cliente.id)}
+                        disabled={isBlocked}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold border transition-all ${isBlocked ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-brand-cream text-brand-navy border-brand-gold hover:bg-brand-gold hover:text-white shadow-sm hover:shadow'}`}
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        {cliente.contatos > 0 ? `+${cliente.contatos}` : 'Atender'}
+                      </button>
+                      {isBlocked && (
+                        <p className={`text-[10px] font-bold mt-1 flex items-center justify-center gap-1 ${cliente.contatos >= 6 ? 'text-slate-400' : 'text-amber-600'}`}>
+                          {cliente.contatos < 6 && <Clock className="w-3 h-3" />}
+                          {timerDisplay}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <button 
+                        onClick={() => setModalQuitar(cliente)}
+                        className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-500 hover:text-white border border-emerald-200 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition-all"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Quitar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          
+          {clientesVisiveis.length === 0 && (
+            <div className="p-12 text-center text-slate-500">
+              <p>Nenhum cliente encontrado com os filtros atuais.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Modal de Quitação */}
+      {modalQuitar && (
+        <div className="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="bg-brand-cream border-b border-slate-100 p-4 flex justify-between items-center">
+              <h3 className="font-bold text-brand-navy text-lg flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                Quitar Contrato
+              </h3>
+              <button onClick={() => setModalQuitar(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={confirmarQuitar} className="p-6 space-y-4">
+              <div className="mb-4">
+                <p className="text-sm text-slate-500">Registrando liquidação de:</p>
+                <p className="text-lg font-bold text-brand-navy">{modalQuitar.nome}</p>
+                <p className="text-xs text-brand-bronze uppercase font-bold">{modalQuitar.id}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-600 mb-1">Data do Envio do Boleto</label>
+                <input 
+                  type="date"
+                  required
+                  value={datasQuitar.dataBoleto}
+                  onChange={e => setDatasQuitar({...datasQuitar, dataBoleto: e.target.value})}
+                  className="w-full border border-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-600 mb-1">Data do Pagamento Efetuado</label>
+                <input 
+                  type="date"
+                  required
+                  value={datasQuitar.dataPagamento}
+                  onChange={e => setDatasQuitar({...datasQuitar, dataPagamento: e.target.value})}
+                  className="w-full border border-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setModalQuitar(null)}
+                  className="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 bg-emerald-500 text-white font-bold py-3 rounded-xl hover:bg-emerald-600 shadow-md transition-colors"
+                >
+                  Confirmar Quitação
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
