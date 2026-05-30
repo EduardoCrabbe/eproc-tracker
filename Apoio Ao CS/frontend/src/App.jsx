@@ -43,7 +43,7 @@ function App() {
 
         <Sidebar role={role} />
         <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-6xl mx-auto">
+          <div className="w-full">
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard role={role} />} />
