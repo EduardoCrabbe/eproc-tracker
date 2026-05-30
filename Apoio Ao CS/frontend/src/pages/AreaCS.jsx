@@ -147,7 +147,7 @@ export default function AreaCS() {
           <p className="text-brand-bronze mt-1">Gerencie sua lista, filtre contratos e registre atendimentos e tentativas.</p>
         </div>
         <div className="flex gap-3">
-          <label className="bg-white dark:bg-[#112240] border border-slate-200 dark:border-slate-700 text-brand-navy dark:text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 dark:bg-[#0B192C] flex items-center gap-2 transition-colors cursor-pointer">
+          <label className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brand-navy dark:text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 dark:bg-[#0B192C] flex items-center gap-2 transition-colors cursor-pointer">
             <UploadCloud className="w-5 h-5 text-brand-bronze" />
             Importar Planilha
             <input type="file" accept=".xlsx" className="hidden" onChange={handleFileUpload} />
@@ -157,28 +157,28 @@ export default function AreaCS() {
 
       {/* Mini-Dashboard AreaCS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-[#112240] p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
           <div className="p-3 bg-blue-50 text-blue-500 rounded-lg"><Users className="w-5 h-5" /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Total de Clientes</p>
             <p className="text-2xl font-black text-brand-navy dark:text-white">{totalAtivos}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-[#112240] p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
           <div className="p-3 bg-emerald-50 text-emerald-500 rounded-lg"><PieChart className="w-5 h-5" /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Atendidos</p>
             <p className="text-2xl font-black text-emerald-600">{atendidos} <span className="text-sm font-medium text-slate-400">({pctAtendidos}%)</span></p>
           </div>
         </div>
-        <div className="bg-white dark:bg-[#112240] p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
           <div className="p-3 bg-rose-50 text-rose-500 rounded-lg"><AlertOctagon className="w-5 h-5" /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Não Atendidos</p>
             <p className="text-2xl font-black text-rose-600">{naoAtendidos} <span className="text-sm font-medium text-slate-400">({pctNaoAtendidos}%)</span></p>
           </div>
         </div>
-        <div className="bg-white dark:bg-[#112240] p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center">
           <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-2">Progresso da Base</p>
           <div className="w-full bg-slate-100 rounded-full h-2.5">
             <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: `${pctAtendidos}%` }}></div>
@@ -186,8 +186,8 @@ export default function AreaCS() {
         </div>
       </div>
       
-      <div className="bg-white dark:bg-[#112240] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#0B192C] flex flex-col md:flex-row items-center gap-4">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col md:flex-row items-center gap-4">
           <div className="flex-1 w-full relative">
             <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input 
@@ -195,7 +195,7 @@ export default function AreaCS() {
               placeholder="Localização Rápida (Nome ou ID)..." 
               value={busca}
               onChange={e => setBusca(e.target.value)}
-              className="w-full bg-white dark:bg-[#112240] border border-slate-200 dark:border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-brand-navy shadow-sm transition-colors"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-brand-navy shadow-sm transition-colors"
             />
           </div>
           
@@ -204,7 +204,7 @@ export default function AreaCS() {
             <select 
               value={filtroTipo}
               onChange={e => setFiltroTipo(e.target.value)}
-              className="w-full md:w-auto text-sm border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-slate-700 bg-white dark:bg-[#112240] focus:outline-none focus:border-brand-navy shadow-sm cursor-pointer"
+              className="w-full md:w-auto text-sm border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:border-brand-navy shadow-sm cursor-pointer"
             >
               <option value="Todos">Filtrar por: Todos os Tipos</option>
               <option value="Veículo">Apenas Veículo</option>
@@ -318,7 +318,7 @@ export default function AreaCS() {
                     <td className="px-4 py-4 text-center">
                       <button 
                         onClick={() => handleTentativa(cliente.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-[#112240] hover:bg-slate-100 hover:text-slate-800 transition-all shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 hover:text-slate-800 transition-all shadow-sm"
                         title="Marcar tentativa sem retorno"
                       >
                         <PhoneForwarded className="w-4 h-4 text-orange-500" />
@@ -352,7 +352,7 @@ export default function AreaCS() {
       {/* Modal de Quitação */}
       {modalQuitar && (
         <div className="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#112240] rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="bg-brand-cream dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 p-4 flex justify-between items-center">
               <h3 className="font-bold text-brand-navy dark:text-white text-lg flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-emerald-500" />
@@ -377,7 +377,7 @@ export default function AreaCS() {
                   required
                   value={datasQuitar.dataBoleto}
                   onChange={e => setDatasQuitar({...datasQuitar, dataBoleto: e.target.value})}
-                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#112240] dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
 
@@ -388,7 +388,7 @@ export default function AreaCS() {
                   required
                   value={datasQuitar.dataPagamento}
                   onChange={e => setDatasQuitar({...datasQuitar, dataPagamento: e.target.value})}
-                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#112240] dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
 

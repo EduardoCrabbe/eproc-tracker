@@ -66,12 +66,12 @@ export default function Quitacoes({ role }) {
         <div className="flex flex-wrap items-center gap-3">
           
           {isManager && (
-            <div className="flex items-center gap-2 bg-white dark:bg-[#112240] border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 shadow-sm">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 shadow-sm">
               <Filter className="w-4 h-4 text-brand-bronze" />
               <select 
                 value={filtroCS}
                 onChange={(e) => setFiltroCS(e.target.value)}
-                className="text-sm text-brand-navy dark:text-slate-200 font-bold focus:outline-none bg-transparent dark:bg-[#112240] cursor-pointer"
+                className="text-sm text-brand-navy dark:text-slate-200 font-bold focus:outline-none bg-transparent dark:bg-slate-800 cursor-pointer"
               >
                 <option value="Todos">Todos os CSs</option>
                 <option value="Edu crabbe">Edu crabbe</option>
@@ -99,7 +99,7 @@ export default function Quitacoes({ role }) {
         </div>
       </header>
 
-      <div className="bg-white dark:bg-[#112240] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden overflow-x-auto">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[1200px]">
           <thead>
             <tr className="bg-brand-cream dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 text-brand-bronze text-[10px] uppercase tracking-wider">
@@ -135,7 +135,7 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.consultaProcesso}
-                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-[#112240] focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none"
                     >
                       <option value="Ativa">Ativa</option>
                       <option value="Excluída">Excluída</option>
@@ -148,7 +148,7 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.protesto}
-                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-[#112240] focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none"
                     >
                       <option value="Não possui">Não possui</option>
                       <option value="Cliente ciente">Cliente ciente</option>
@@ -157,7 +157,7 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.tarifasRestituiveis}
-                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-[#112240] focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none"
                     >
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
@@ -174,7 +174,7 @@ export default function Quitacoes({ role }) {
           </tbody>
           {/* Rodapé com Totais */}
           {quitadosVisiveis.length > 0 && (
-            <tfoot className="bg-slate-50 dark:bg-[#0B192C] border-t-2 border-slate-200 dark:border-slate-700">
+            <tfoot className="bg-slate-50 dark:bg-slate-900/50 border-t-2 border-slate-200 dark:border-slate-700">
               <tr>
                 <td className="px-4 py-4 text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Calculator className="w-4 h-4" /> TOTAL CONSOLIDADO

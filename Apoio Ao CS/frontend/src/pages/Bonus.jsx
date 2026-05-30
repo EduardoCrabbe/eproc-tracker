@@ -33,7 +33,7 @@ export default function Bonus({ role }) {
   return (
     <div className="space-y-8">
       <header>
-        <h2 className="text-3xl font-bold text-brand-navy">Bônus & Comissões</h2>
+        <h2 className="text-3xl font-bold text-brand-navy dark:text-white">Bônus & Comissões</h2>
         <p className="text-brand-bronze mt-1">Lançamento manual de comissões por metas alcançadas (Níveis 1 a 5).</p>
       </header>
       
@@ -86,7 +86,7 @@ export default function Bonus({ role }) {
         )}
 
         <div className={isManager ? "lg:col-span-3" : "lg:col-span-2"}>
-          <div className="bg-white dark:bg-[#112240] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden h-full flex flex-col">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden h-full flex flex-col">
             <div className="p-6 border-b border-slate-100 flex items-center gap-2">
               <History className="w-5 h-5 text-brand-bronze" />
               <h3 className="text-xl font-bold text-brand-navy">Extrato de Ganhos Extras</h3>
