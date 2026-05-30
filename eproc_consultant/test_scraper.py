@@ -2,8 +2,9 @@ import os
 from openpyxl import load_workbook
 from scraper import EprocScraper
 
-def run_tests():
-    planilha_path = os.path.join(os.path.dirname(__file__), "..", "platform_manager", "base_clientes.xlsx")
+def run_tests(planilha_path=None):
+    if planilha_path is None:
+        planilha_path = os.path.join(os.path.dirname(__file__), "..", "platform_manager", "base_clientes.xlsx")
     
     if not os.path.exists(planilha_path):
         print(f"❌ Erro: Planilha não encontrada em {planilha_path}")

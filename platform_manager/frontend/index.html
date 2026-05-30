@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eproc Tracker | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="glass-container main-layout">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h2>Reis Revisional</h2>
+                <span class="badge">Eproc Tracker</span>
+            </div>
+            
+            <nav class="menu">
+                <a href="#" class="active"><i class="icon">📊</i> Dashboard</a>
+                <a href="#"><i class="icon">⚙️</i> Configurações</a>
+            </nav>
+
+            <div class="upload-area" id="drop-zone">
+                <p>Arraste e solte sua planilha</p>
+                <span>ou</span>
+                <input type="file" id="file-upload" accept=".xlsx" hidden>
+                <button class="btn-secondary" onclick="document.getElementById('file-upload').click()">Escolher Arquivo</button>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="top-bar">
+                <h1>Painel de Monitoramento Eproc</h1>
+                <div class="actions">
+                    <button class="btn-primary scan-btn" id="btn-scan" onclick="startScan()">
+                        <span class="btn-text">🔍 Iniciar Varredura</span>
+                        <div class="loader hidden" id="scan-loader"></div>
+                    </button>
+                </div>
+            </header>
+
+            <section class="add-client-section glass-panel">
+                <h3>Adicionar Novo Cliente</h3>
+                <form id="add-client-form" onsubmit="addClient(event)">
+                    <div class="input-group">
+                        <input type="text" id="new-cpf" placeholder="CPF (Ex: 123.456.789-00)" required>
+                        <input type="text" id="new-process" placeholder="Nº Processo (Opcional)">
+                        <button type="submit" class="btn-primary">Adicionar na Planilha</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="table-section glass-panel">
+                <div class="table-header">
+                    <h3>Base de Clientes</h3>
+                    <span id="scan-status-text" class="status-indicator"></span>
+                </div>
+                <div class="table-container">
+                    <table id="clients-table">
+                        <thead>
+                            <tr>
+                                <th>CPF</th>
+                                <th>Processo</th>
+                                <th>Status Consulta</th>
+                                <th>Classe</th>
+                                <th>Triagem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal de Notificação -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
