@@ -71,7 +71,7 @@ export default function Quitacoes({ role }) {
               <select 
                 value={filtroCS}
                 onChange={(e) => setFiltroCS(e.target.value)}
-                className="text-sm text-brand-navy dark:text-white font-bold focus:outline-none bg-transparent cursor-pointer"
+                className="text-sm text-brand-navy dark:text-slate-200 font-bold focus:outline-none bg-transparent dark:bg-[#112240] cursor-pointer"
               >
                 <option value="Todos">Todos os CSs</option>
                 <option value="Edu crabbe">Edu crabbe</option>
@@ -119,7 +119,7 @@ export default function Quitacoes({ role }) {
               const economiaPct = item.valorOriginal > 0 ? ((economiaReal / item.valorOriginal) * 100).toFixed(1) : 0;
 
               return (
-                <tr key={index} className="hover:bg-slate-50 dark:bg-[#0B192C] transition-colors">
+                <tr key={index} className="hover:bg-slate-50 dark:bg-transparent dark:hover:bg-white/5 transition-colors">
                   <td className="px-4 py-3">
                     <div className="text-sm font-bold text-brand-navy dark:text-white">{item.cliente}</div>
                     <div className="text-xs text-brand-bronze font-medium">Resp: {item.cs}</div>
@@ -135,7 +135,7 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.consultaProcesso}
-                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 bg-white dark:bg-[#112240] focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-[#112240] focus:outline-none"
                     >
                       <option value="Ativa">Ativa</option>
                       <option value="Excluída">Excluída</option>
@@ -148,7 +148,7 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.protesto}
-                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 bg-white dark:bg-[#112240] focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-[#112240] focus:outline-none"
                     >
                       <option value="Não possui">Não possui</option>
                       <option value="Cliente ciente">Cliente ciente</option>
@@ -157,7 +157,7 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.tarifasRestituiveis}
-                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 bg-white dark:bg-[#112240] focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 dark:text-slate-200 bg-white dark:bg-[#112240] focus:outline-none"
                     >
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>

@@ -277,6 +277,34 @@ def registrar_atendimento(codigo_dj: str, user: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.delete("/api/areacs/atendimento/{codigo_dj}")
+def desfazer_atendimento(codigo_dj: str, user: str):
+    planilha_path = get_crm_file(user)
+    if not os.path.exists(planilha_path):
+        raise HTTPException(status_code=404, detail="Planilha não encontrada.")
+        
+    try:
+        wb = load_workbook(planilha_path)
+        sheet = wb.active
+        
+        atualizado = False
+        for row_idx in range(2, sheet.max_row + 1):
+            if str(sheet.cell(row=row_idx, column=1).value) == str(codigo_dj):
+                contatos = sheet.cell(row=row_idx, column=7).value
+                contatos = int(contatos) if contatos is not None else 0
+                if contatos > 0:
+                    sheet.cell(row=row_idx, column=7, value=contatos - 1)
+                atualizado = True
+                break
+                
+        if atualizado:
+            wb.save(planilha_path)
+            return {"message": "Atendimento desfeito."}
+        else:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/areacs/quitar/{codigo_dj}")
 def quitar_contrato(codigo_dj: str, payload: CRMQuitar, user: str):
     planilha_path = get_crm_file(user)
@@ -353,8 +381,16 @@ def registrar_tentativa(codigo_dj: str, user: str):
 
 @app.get("/api/dashboard/stats")
 def dashboard_stats(user: str):
-    planilha_path = get_crm_file(user)
-    if not os.path.exists(planilha_path):
+    if user == "geral":
+        arquivos = [f for f in os.listdir(UPLOADS_DIR) if f.startswith("atendimentos_") and f.endswith(".xlsx")]
+    else:
+        planilha_path = get_crm_file(user)
+        if not os.path.exists(planilha_path):
+            arquivos = []
+        else:
+            arquivos = [f"atendimentos_{user}.xlsx"]
+            
+    if not arquivos:
         return {
             "naoAtendidos": 0, "naoAtendidosPct": 0,
             "tentativas": 0,
@@ -364,46 +400,46 @@ def dashboard_stats(user: str):
         }
         
     try:
-        wb = load_workbook(planilha_path, data_only=True)
-        sheet = wb.active
-        
         total_clientes = 0
         atendidos = 0
         tentativas_totais = 0
         prioridades = []
-        
-        VALOR_COMISSAO_POR_ATENDIMENTO = 5.00 # Exemplo: 5 reais por atendimento
         ganhos_totais = 0.0
+        VALOR_COMISSAO_POR_ATENDIMENTO = 5.00 # Exemplo: 5 reais por atendimento
+
+        for arquivo in arquivos:
+            wb = load_workbook(os.path.join(UPLOADS_DIR, arquivo), data_only=True)
+            sheet = wb.active
         
-        for idx, row in enumerate(sheet.iter_rows(values_only=True)):
-            if idx == 0:
-                continue
-            
-            status = str(row[8] if len(row) > 8 and row[8] is not None else "Ativo")
-            if status != "Ativo":
-                continue # Focar apenas nos ativos
+            for idx, row in enumerate(sheet.iter_rows(values_only=True)):
+                if idx == 0:
+                    continue
                 
-            total_clientes += 1
-            codigo_dj = str(row[0])
-            nome = str(row[1])
-            criticidade = str(row[5])
-            contatos = int(row[6] if row[6] is not None else 0)
-            tentativas = int(row[7] if row[7] is not None else 0)
-            ultimo_contato = float(row[9]) if len(row) > 9 and row[9] else None
-            
-            tentativas_totais += tentativas
-            
-            if contatos > 0:
-                atendidos += 1
-                ganhos_totais += (contatos * VALOR_COMISSAO_POR_ATENDIMENTO)
+                status = str(row[8] if len(row) > 8 and row[8] is not None else "Ativo")
+                if status != "Ativo":
+                    continue # Focar apenas nos ativos
+                    
+                total_clientes += 1
+                codigo_dj = str(row[0])
+                nome = str(row[1])
+                criticidade = str(row[5])
+                contatos = int(row[6] if row[6] is not None else 0)
+                tentativas = int(row[7] if row[7] is not None else 0)
+                ultimo_contato = float(row[9]) if len(row) > 9 and row[9] else None
                 
-            if criticidade in ["Crítico", "Atenção"]:
-                prioridades.append({
-                    "id": codigo_dj,
-                    "nome": nome,
-                    "criticidade": criticidade,
-                    "ultimoContato": ultimo_contato
-                })
+                tentativas_totais += tentativas
+                
+                if contatos > 0:
+                    atendidos += 1
+                    ganhos_totais += (contatos * VALOR_COMISSAO_POR_ATENDIMENTO)
+                    
+                if criticidade in ["Crítico", "Atenção"]:
+                    prioridades.append({
+                        "id": codigo_dj,
+                        "nome": nome,
+                        "criticidade": criticidade,
+                        "ultimoContato": ultimo_contato
+                    })
                 
         nao_atendidos = total_clientes - atendidos
         

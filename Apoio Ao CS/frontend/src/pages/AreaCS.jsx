@@ -63,6 +63,15 @@ export default function AreaCS() {
     }
   };
 
+  const handleDesfazerAtendimento = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/atendimento/${id}?user=${username}`, { method: "DELETE" });
+      if (res.ok) fetchClientes();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleTentativa = async (id) => {
     try {
       const res = await fetch(`${API_URL}/tentativa/${id}?user=${username}`, { method: "POST" });
@@ -125,9 +134,9 @@ export default function AreaCS() {
   const pctNaoAtendidos = totalAtivos > 0 ? Math.round((naoAtendidos / totalAtivos) * 100) : 0;
 
   const getCriticidadeStyle = (nivel) => {
-    if (nivel === 'Crítico') return 'bg-red-50 text-red-700 border-red-200';
-    if (nivel === 'Atenção') return 'bg-amber-50 text-amber-700 border-amber-200';
-    return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (nivel === 'Crítico') return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800';
+    if (nivel === 'Atenção') return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800';
+    return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800';
   };
 
   return (
@@ -261,7 +270,7 @@ export default function AreaCS() {
                       </select>
                     </td>
                     <td className="px-4 py-4 space-y-1">
-                      <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${cliente.contrato === 'Veículo' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-slate-100 text-slate-700 border-slate-200 dark:border-slate-700'}`}>
+                      <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${cliente.contrato === 'Veículo' ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'}`}>
                         {cliente.contrato}
                       </div>
                       <div className="flex items-center gap-1 mt-1">
@@ -269,7 +278,7 @@ export default function AreaCS() {
                         <select 
                           value={cliente.processos}
                           onChange={(e) => handleChangeField(cliente.id, 'processos', e.target.value)}
-                          className={`text-[10px] border rounded p-0.5 focus:outline-none cursor-pointer font-bold ${cliente.processos === 'Sim' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-emerald-700 bg-emerald-50 border-emerald-200'}`}
+                          className={`text-[10px] border rounded p-0.5 focus:outline-none cursor-pointer font-bold ${cliente.processos === 'Sim' ? 'text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800' : 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800'}`}
                         >
                           <option value="Sim">Sim</option>
                           <option value="Não">Não</option>
@@ -278,14 +287,26 @@ export default function AreaCS() {
                     </td>
                     
                     <td className="px-4 py-4 text-center">
-                      <button 
-                        onClick={() => handleAtendimento(cliente.id)}
-                        disabled={isBlocked}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold border transition-all ${isBlocked ? 'bg-slate-100 text-slate-400 border-slate-200 dark:border-slate-700 cursor-not-allowed' : 'bg-brand-cream dark:bg-slate-900/50 text-brand-navy dark:text-white border-brand-gold hover:bg-brand-gold hover:text-white shadow-sm hover:shadow'}`}
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                        {cliente.contatos > 0 ? `Atendido (${cliente.contatos})` : 'Atender'}
-                      </button>
+                      <div className="flex items-center justify-center gap-1">
+                        <button 
+                          onClick={() => handleAtendimento(cliente.id)}
+                          disabled={isBlocked}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold border transition-all ${isBlocked ? 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:border-slate-700 cursor-not-allowed' : 'bg-brand-cream dark:bg-slate-900/50 text-brand-navy dark:text-white border-brand-gold hover:bg-brand-gold hover:text-white shadow-sm hover:shadow'}`}
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          {cliente.contatos > 0 ? `Atendido (${cliente.contatos})` : 'Atender'}
+                        </button>
+                        
+                        {cliente.contatos > 0 && !isBlocked && (
+                          <button 
+                            onClick={() => handleDesfazerAtendimento(cliente.id)}
+                            className="p-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
+                            title="Desfazer Atendimento (foi clicado por engano)"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                       {isBlocked && (
                         <p className={`text-[10px] font-bold mt-1 flex items-center justify-center gap-1 ${cliente.contatos >= 6 ? 'text-slate-400' : 'text-amber-600'}`}>
                           {cliente.contatos < 6 && <Clock className="w-3 h-3" />}
@@ -356,7 +377,7 @@ export default function AreaCS() {
                   required
                   value={datasQuitar.dataBoleto}
                   onChange={e => setDatasQuitar({...datasQuitar, dataBoleto: e.target.value})}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#112240] dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
 
@@ -367,7 +388,7 @@ export default function AreaCS() {
                   required
                   value={datasQuitar.dataPagamento}
                   onChange={e => setDatasQuitar({...datasQuitar, dataPagamento: e.target.value})}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#112240] dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
 

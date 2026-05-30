@@ -48,7 +48,8 @@ export default function Dashboard({ role }) {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch(`${API_URL}?user=${username}`);
+      const fetchUser = isManager ? 'geral' : username;
+      const res = await fetch(`${API_URL}?user=${fetchUser}`);
       if (res.ok) {
         const data = await res.json();
         setStats(data);
@@ -147,7 +148,7 @@ export default function Dashboard({ role }) {
           </div>
           <div>
             <div className="text-4xl font-black text-red-500">{stats.naoAtendidos}</div>
-            <div className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-2">Representa {stats.naoAtendidosPct}% da base</div>
+            <div className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-2">Faltam {stats.naoAtendidosPct}% para terminar de atender a base {isManager ? 'geral' : ''}</div>
           </div>
         </div>
 
@@ -169,20 +170,22 @@ export default function Dashboard({ role }) {
           </div>
           <div>
             <div className="text-4xl font-black text-emerald-500">{stats.atendidos}</div>
-            <div className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-2">Representa {stats.atendidosPct}% da base</div>
+            <div className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-2">Representa {stats.atendidosPct}% da base {isManager ? 'geral' : ''}</div>
           </div>
         </div>
 
-        <div className="bg-brand-navy dark:bg-slate-900 p-6 rounded-2xl shadow-lg border border-brand-navy/10 dark:border-slate-800 flex flex-col justify-between transform hover:scale-[1.02] transition-transform text-white">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-sm font-bold text-blue-200">Ganhos Estimados</h3>
-            <div className="p-2 rounded-lg bg-white/10 text-brand-gold"><DollarSign className="w-5 h-5" /></div>
+        {!isManager && (
+          <div className="bg-brand-navy dark:bg-slate-900 p-6 rounded-2xl shadow-lg border border-brand-navy/10 dark:border-slate-800 flex flex-col justify-between transform hover:scale-[1.02] transition-transform text-white">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-sm font-bold text-blue-200">Ganhos Estimados</h3>
+              <div className="p-2 rounded-lg bg-white/10 text-brand-gold"><DollarSign className="w-5 h-5" /></div>
+            </div>
+            <div>
+              <p className="text-4xl font-black text-brand-gold">{formatCurrency(stats.ganhosTotais)}</p>
+              <p className="text-xs text-blue-300 font-medium mt-1">Baseado na volumetria de hoje</p>
+            </div>
           </div>
-          <div>
-            <p className="text-4xl font-black text-brand-gold">{formatCurrency(stats.ganhosTotais)}</p>
-            <p className="text-xs text-blue-300 font-medium mt-1">Baseado na volumetria de hoje</p>
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

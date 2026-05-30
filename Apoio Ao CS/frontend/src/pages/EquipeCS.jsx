@@ -14,7 +14,11 @@ export default function EquipeCS() {
           <h2 className="text-3xl font-bold text-brand-navy">Equipe CS</h2>
           <p className="text-brand-bronze mt-1">Acompanhe a volumetria e ganhos de toda a sua equipe de Customer Success.</p>
         </div>
-        <div>
+        <div className="flex gap-3">
+          <button className="bg-brand-gold text-brand-navy dark:text-brand-navy px-4 py-2 rounded-xl font-bold shadow-md hover:bg-yellow-500 flex items-center gap-2 transition-colors">
+            <TrendingUp className="w-5 h-5" />
+            Adicionar Campanha
+          </button>
           <button className="bg-brand-navy text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-blue-900 flex items-center gap-2 transition-colors">
             <UserPlus className="w-5 h-5 text-brand-gold" />
             Adicionar CS
