@@ -80,7 +80,7 @@ export default function Quitacoes({ role }) {
             </div>
           )}
 
-          <button className="bg-brand-gold text-brand-navy dark:text-white px-4 py-2 rounded-xl font-bold shadow-md hover:bg-[#b8952b] flex items-center gap-2 transition-all">
+          <button onClick={() => alert('Exportando relatório para PDF/Excel...')} className="bg-brand-gold text-brand-navy dark:text-white px-4 py-2 rounded-xl font-bold shadow-md hover:bg-[#b8952b] flex items-center gap-2 transition-all">
             <Download className="w-5 h-5" />
             Exportar
           </button>

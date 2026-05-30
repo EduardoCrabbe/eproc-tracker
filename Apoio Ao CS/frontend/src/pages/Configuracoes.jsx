@@ -125,7 +125,7 @@ export default function Configuracoes() {
         ></textarea>
 
         <div className="flex justify-end mt-4">
-          <button className="bg-brand-navy text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-blue-900 transition-colors">
+          <button onClick={() => alert('Prompt salvo com sucesso!')} className="bg-brand-navy text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-blue-900 transition-colors">
             Salvar Prompt
           </button>
         </div>

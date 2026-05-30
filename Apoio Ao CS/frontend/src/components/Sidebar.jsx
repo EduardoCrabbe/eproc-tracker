@@ -71,7 +71,7 @@ export default function Sidebar({ role, isDarkMode, toggleDarkMode }) {
           </div>
         </div>
 
-        <button className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm font-medium px-2 py-2 w-full">
+        <button onClick={() => window.location.reload()} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm font-medium px-2 py-2 w-full">
           <LogOut className="w-4 h-4" />
           Sair
         </button>

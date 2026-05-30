@@ -47,11 +47,11 @@ export default function EquipeCS() {
     <div className="space-y-6">
       <header className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-brand-navy">Equipe CS</h2>
+          <h2 className="text-3xl font-bold text-brand-navy dark:text-white">Equipe CS</h2>
           <p className="text-brand-bronze mt-1">Acompanhe a volumetria e ganhos de toda a sua equipe de Customer Success.</p>
         </div>
         <div className="flex gap-3">
-          <button className="bg-brand-gold text-brand-navy dark:text-brand-navy px-4 py-2 rounded-xl font-bold shadow-md hover:bg-yellow-500 flex items-center gap-2 transition-colors">
+          <button onClick={() => alert('Em breve: Gestão de Campanhas de Desconto!')} className="bg-brand-gold text-brand-navy dark:text-brand-navy px-4 py-2 rounded-xl font-bold shadow-md hover:bg-yellow-500 flex items-center gap-2 transition-colors">
             <TrendingUp className="w-5 h-5" />
             Adicionar Campanha
           </button>
@@ -136,9 +136,9 @@ export default function EquipeCS() {
                   <td className="px-6 py-4 text-sm font-bold text-blue-500 text-center">
                     {cs.comentarios}
                   </td>
-                  <td className="px-6 py-4 text-sm font-bold text-brand-navy text-right">R$ {cs.ganhos.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-sm font-bold text-brand-navy dark:text-white text-right">R$ {cs.ganhos.toFixed(2)}</td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-sm text-brand-bronze hover:text-brand-navy font-bold underline">Ver Planilha</button>
+                    <button onClick={() => alert('Redirecionando para planilha detalhada do CS...')} className="text-sm text-brand-bronze hover:text-brand-navy font-bold underline">Ver Planilha</button>
                   </td>
                 </tr>
               );
