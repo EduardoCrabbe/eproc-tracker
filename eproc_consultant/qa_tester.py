@@ -42,7 +42,7 @@ def testar_conexao_eproc():
 
 if __name__ == "__main__":
     print("--- 🛡️ Iniciando Pre-flight Check ---")
-    planilha = "base_clientes.xlsx" # Nome padrão do nosso arquivo
+    planilha = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "platform_manager", "base_clientes.xlsx") # Nome padrão do nosso arquivo
     if validar_contrato_planilha(planilha) and testar_conexao_eproc():
         print("🚀 Ambiente pronto para automação!")
     else:

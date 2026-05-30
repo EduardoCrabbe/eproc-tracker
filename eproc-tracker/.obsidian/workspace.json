@@ -1,0 +1,214 @@
+{
+  "main": {
+    "id": "36d836707c30d769",
+    "type": "split",
+    "children": [
+      {
+        "id": "88f18a5cac5ef3ca",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f3ecf4fb5476d69d",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Visualização em gráfico"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "9856476b0700c216",
+    "type": "split",
+    "children": [
+      {
+        "id": "ef102668ab3318d6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "644dd3b3d7bec36a",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de arquivos"
+            }
+          },
+          {
+            "id": "4573f634d46fb0e9",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Procurar"
+            }
+          },
+          {
+            "id": "d4126253ab635022",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9156d1d71180868e",
+    "type": "split",
+    "children": [
+      {
+        "id": "872178dae97250bc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dc2c78be48e73a1f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Sem título.base",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Links inversos para Sem título"
+            }
+          },
+          {
+            "id": "110e76cac4cec5e2",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Sem título.base",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Links de saída para Sem título"
+            }
+          },
+          {
+            "id": "267f87ecbd09e8f5",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "c7a5ff640b933e2a",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas as propriedades"
+            }
+          },
+          {
+            "id": "5109457e7011836a",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Sem título.base",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Sumário de Sem título"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir a troca rápida": false,
+      "graph:Abrir visualização em gráfico": false,
+      "canvas:Criar novo canvas": false,
+      "daily-notes:Abrir a nota de hoje": false,
+      "templates:Inserir modelo": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Criar nova base": false
+    }
+  },
+  "active": "f3ecf4fb5476d69d",
+  "lastOpenFiles": [
+    "Apoio Ao CS/walkthrough.md",
+    "Apoio Ao CS/task.md",
+    "Apoio Ao CS/regras_negocio.md",
+    "Apoio Ao CS/README.md",
+    "Apoio Ao CS/implementation_plan.md",
+    "Apoio Ao CS/git-flow.md",
+    "Apoio Ao CS/banco_de_dados.md",
+    "Engenharia de Software/05. Documentacao da API (Swagger).md",
+    "Engenharia de Software/04. Entidade-Relacionamento (ERD).md",
+    "Engenharia de Software/00 - Índice Engenharia.md",
+    "Engenharia de Software/03. Diagramas de Sequencia.md",
+    "Engenharia de Software/02. C4 Model - Arquitetura.md",
+    "Engenharia de Software/01. Documento de Requisitos (PRD).md",
+    "Engenharia de Software",
+    "Apoio Ao CS/Projeto para Reis Revisional/Eproc Tracker - Arquitetura Base/Eproc Tracker - Arquitetura Base.md",
+    "Apoio Ao CS/Projeto para Reis Revisional/Eproc Tracker - Arquitetura Base/00 - Índice Eproc.md",
+    "Apoio Ao CS/Projeto para Reis Revisional/Eproc Tracker - Arquitetura Base/3. Fluxo de Automação.md",
+    "Apoio Ao CS/Projeto para Reis Revisional/Eproc Tracker - Arquitetura Base/2. Arquitetura do Scraper.md",
+    "Apoio Ao CS/Projeto para Reis Revisional/Eproc Tracker - Arquitetura Base/1. Setup Inicial.md",
+    "Apoio Ao CS/Projeto para Reis Revisional/Eproc Tracker - Arquitetura Base",
+    "Apoio Ao CS/00 - Índice CS Manager.md",
+    "Apoio Ao CS/arquitetura.md",
+    "Sem título",
+    "Apoio Ao CS",
+    "Sem título.md",
+    "Sem título.base",
+    "Apoio Ao CS/Projeto para Reis Revisional",
+    "Bem-vindo.md",
+    "crie um link.md"
+  ]
+}

@@ -18,11 +18,12 @@ class EprocScraper:
         print("⚙️ [SISTEMA] Inicializando motor web otimizado...")
         opcoes = uc.ChromeOptions()
         
-        # Otimizações de performance: desativa GPU e bloqueia carregamento de imagens
+        # Otimizações para rodar consumindo o mínimo de CPU/RAM possível
         opcoes.add_argument("--disable-gpu")
+        opcoes.add_argument("--disable-dev-shm-usage")
         opcoes.add_argument("--no-sandbox")
-        prefs = {"profile.managed_default_content_settings.images": 2}
-        opcoes.add_experimental_option("prefs", prefs)
+        opcoes.add_argument("--disable-extensions")
+        opcoes.add_argument("--disable-notifications")
 
         # Inicializa o driver com o undetected_chromedriver e suporte nativo a headless
         # Especificamos version_main=147 para parear com a versão instalada no PC
@@ -42,7 +43,7 @@ class EprocScraper:
         if exc_type:
             print(f"💥 [FALHA CRÍTICA] Execução interrompida: {exc_val}")
 
-    def consultar_processo(self, numero_processo: str = None, cpf: str = None):
+    def consultar_processo(self, numero_processo: str = None, cpf: str = None, processo_esperado: str = None):
         """
         Lógica principal de roteamento (Seletor NU vs CP).
         """
@@ -78,18 +79,45 @@ class EprocScraper:
                 input_cp.clear()
                 input_cp.send_keys(cpf)
                 
-            # Passo 4: Aguardar botão de consulta sbmConsultar e clicar
-            print("⏳ Aguardando botão de consulta...")
-            botao_consultar = wait.until(EC.element_to_be_clickable((By.ID, "sbmConsultar")))
-            botao_consultar.click()
-            print("🚀 Consulta enviada com sucesso!")
+            print("⏳ Preenchimento concluído.")
             
-            # A pausa dinâmica para resolver o captcha antes de continuar
-            input("⚠️ [SISTEMA] Resolva o Captcha no navegador. Após a página do processo carregar, pressione ENTER aqui no terminal para continuar...")
+            # Aumentando a margem para 10s para garantir estabilidade máxima no Cloudflare
+            print("⏳ Aguardando 10 segundos para a validação automática do Captcha (Cloudflare)...")
+            time.sleep(10)
             
+            print("🖱️ Clicando em 'Consultar' automaticamente...")
+            try:
+                btn_consultar = wait.until(EC.element_to_be_clickable((By.ID, "sbmConsultar")))
+                btn_consultar.click()
+            except Exception as e:
+                print(f"⚠️ Erro ao clicar no botão Consultar: {e}")
+                
+            print("⏳ Aguardando a lista de resultados carregar com margem segura...")
+            time.sleep(6) # Pausa maior para o Eproc processar e trazer a lista com tranquilidade
+            
+            # Se foi passada a expectativa de um processo, tenta clicar nele na lista
+            if processo_esperado:
+                print(f"🖱️ Tentando clicar automaticamente no processo {processo_esperado} na lista...")
+                try:
+                    # Tenta encontrar o link exato com o texto do processo
+                    link_processo = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, processo_esperado)))
+                    link_processo.click()
+                    time.sleep(2) # Aguarda a nova aba carregar
+                except Exception as e:
+                    print(f"⚠️ Não foi possível clicar no processo na lista (ele pode não estar lá ou a página mudou): {e}")
+            
+            # Se o Eproc abriu o processo em uma nova guia, foca nela
+            if len(self.driver.window_handles) > 1:
+                self.driver.switch_to.window(self.driver.window_handles[-1])
+                
             print("⏳ Capturando código-fonte da página para análise estática...")
             with open("page_source.html", "w", encoding="utf-8") as f:
                 f.write(self.driver.page_source)
+            
+            # Retorna para a aba original de busca para a próxima iteração
+            if len(self.driver.window_handles) > 1:
+                self.driver.close()
+                self.driver.switch_to.window(self.driver.window_handles[0])
             print("✅ HTML salvo em page_source.html!")
             
         except TimeoutException:
@@ -99,16 +127,31 @@ class EprocScraper:
 
     def aplicar_triagem(self, acao: str, movimentacao: str) -> str:
         """
-        Core Business Rule: Execução vs Busca e Apreensão.
+        Core Business Rule: Filtra os processos de interesse e aplica alertas.
         """
         acao = acao.upper()
         movimentacao = movimentacao.upper()
         
+        # 1. Verifica se a classe da ação é uma das permitidas
+        classes_permitidas = [
+            "BUSCA E APREENSÃO",
+            "EXECUÇÃO DE TÍTULO EXTRAJUDICIAL",
+            "AÇÃO MONITÓRIA",
+            "MONITÓRIA",
+            "AÇÃO DE COBRANÇA",
+            "COBRANÇA"
+        ]
+        
+        eh_permitida = any(c in acao for c in classes_permitidas)
+        if not eh_permitida:
+            return "⏭️ IGNORADO (OUTRA CLASSE)"
+        
+        # 2. Regra específica para Busca e Apreensão (Alerta vermelho)
         if "BUSCA E APREENSÃO" in acao:
             if "PETIÇÃO" in movimentacao or "MANDADO" in movimentacao:
                 return "🚨 ALERTA VERMELHO"
         
-        # Para casos de 'Execução' ou 'Busca' sem as palavras-chave
+        # Para casos de 'Execução', 'Monitória', 'Cobrança' ou 'Busca' sem as palavras-chave
         return "✅ REGISTRO NORMAL"
 
 # ==========================================
