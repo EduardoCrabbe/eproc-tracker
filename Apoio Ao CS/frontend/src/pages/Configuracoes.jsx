@@ -27,8 +27,11 @@ export default function Configuracoes() {
   };
 
   const handleAddCS = (e) => {
-    e.preventDefault();
-    if (!novoCS.nome || !novoCS.email) return;
+    if (e) e.preventDefault();
+    if (!novoCS.nome || !novoCS.email) {
+      alert('Por favor, preencha o Nome e o E-mail do CS!');
+      return;
+    }
 
     const newCsEntry = {
       id: Date.now(),
@@ -144,7 +147,7 @@ export default function Configuracoes() {
               </button>
             </div>
             
-            <form onSubmit={handleAddCS} className="p-6 space-y-4">
+            <form className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">Nome Completo</label>
                 <input 
@@ -193,7 +196,8 @@ export default function Configuracoes() {
                   Cancelar
                 </button>
                 <button 
-                  type="submit" 
+                  type="button" 
+                  onClick={handleAddCS}
                   className="flex-1 bg-brand-navy text-white font-bold py-3 rounded-xl hover:bg-blue-900 shadow-md transition-colors"
                 >
                   Confirmar Cadastro
