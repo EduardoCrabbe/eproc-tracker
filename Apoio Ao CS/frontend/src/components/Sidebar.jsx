@@ -9,11 +9,10 @@ export default function Sidebar({ role }) {
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Início' },
     ...(isManager ? [{ to: '/equipe-cs', icon: Users, label: 'Equipe CS' }] : []),
-    { to: '/meus-clientes', icon: Users, label: 'Meus Clientes' },
+    ...(!isManager ? [{ to: '/meus-clientes', icon: Users, label: 'Meus Clientes' }] : []),
     { to: '/quitacoes', icon: Activity, label: 'Quitações' },
     { to: '/bonus', icon: Trophy, label: 'Bônus e Comissões' },
     { to: '/eproc-tracker', icon: Activity, label: 'Monitoramento' },
-    { to: '/planilha-valores', icon: Calculator, label: 'Alertas Críticos' },
     ...(isManager ? [{ to: '/configuracoes', icon: Settings, label: 'Configurações' }] : []),
   ];
 

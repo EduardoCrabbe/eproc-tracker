@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Users, AlertOctagon, AlertTriangle, CheckCircle2, Search, PlusCircle, Calendar as CalendarIcon, Clock, Filter, AlertCircle, RefreshCw, PhoneForwarded, DollarSign } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Users, AlertOctagon, AlertTriangle, CheckCircle2, Search, PlusCircle, Calendar as CalendarIcon, Clock, Filter, AlertCircle, RefreshCw, PhoneForwarded, DollarSign, BellRing } from 'lucide-react';
 
 export default function Dashboard({ role }) {
   const isManager = role === 'Gerente' || role === 'Supervisor';
   const username = "educrabbe"; // Simulação
+  const navigate = useNavigate();
   const API_URL = "http://127.0.0.1:8000/api/dashboard/stats";
+  const EPROC_URL = "http://127.0.0.1:8000/api/clientes";
 
   const [stats, setStats] = useState({
     totalClientes: 0,
@@ -16,18 +19,40 @@ export default function Dashboard({ role }) {
   });
 
   const [now, setNow] = useState(Date.now());
+  const [alertasCriticos, setAlertasCriticos] = useState(0);
 
   useEffect(() => {
     fetchStats();
-    const interval = setInterval(() => setNow(Date.now()), 60000);
+    fetchEprocAlerts();
+    const interval = setInterval(() => {
+      setNow(Date.now());
+      fetchEprocAlerts();
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  const fetchEprocAlerts = async () => {
+    try {
+      const res = await fetch(`${EPROC_URL}?user=${username}`);
+      if (res.ok) {
+        const data = await res.json();
+        const qtdCriticos = data.clientes?.filter(c => 
+          c.triagem && (c.triagem.includes("VERMELHO") || c.triagem.includes("REQUER"))
+        ).length || 0;
+        setAlertasCriticos(qtdCriticos);
+      }
+    } catch (e) {
+      console.error("Erro ao buscar alertas do Eproc", e);
+    }
+  };
 
   const fetchStats = async () => {
     try {
       const res = await fetch(`${API_URL}?user=${username}`);
-      const data = await res.json();
-      setStats(data);
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      }
     } catch (e) {
       console.error("Erro ao buscar stats do dashboard", e);
     }
@@ -80,6 +105,27 @@ export default function Dashboard({ role }) {
 
   return (
     <div className="space-y-8 pb-12">
+      {/* Tarja de Alertas Críticos (Eproc) */}
+      {alertasCriticos > 0 && (
+        <div className="bg-red-600/95 border-b-4 border-brand-gold text-white px-6 py-4 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in slide-in-from-top-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 p-2 rounded-full animate-pulse">
+              <BellRing className="w-6 h-6 text-brand-gold" />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-brand-gold uppercase tracking-wider">Atenção Necessária!</h3>
+              <p className="text-sm font-medium">Foram detectados <span className="font-bold underline">{alertasCriticos} clientes</span> com mandados ou petições críticas na última varredura do robô.</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => navigate('/eproc-tracker')}
+            className="bg-brand-gold text-brand-navy hover:bg-yellow-400 font-bold px-6 py-2.5 rounded-xl shadow-md transition-all whitespace-nowrap"
+          >
+            Verificar Agora
+          </button>
+        </div>
+      )}
+
       <header className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold text-brand-navy">Painel de Controle</h2>
@@ -148,7 +194,7 @@ export default function Dashboard({ role }) {
           <p className="text-sm text-slate-500 mb-4">Clientes que exigem retorno Semanal ou Quinzenal.</p>
           
           <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
-            {stats.prioridades.length === 0 ? (
+            {(!stats.prioridades || stats.prioridades.length === 0) ? (
               <div className="p-6 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200">
                 Nenhuma prioridade na sua base.
               </div>

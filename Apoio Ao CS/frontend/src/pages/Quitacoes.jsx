@@ -32,9 +32,16 @@ export default function Quitacoes({ role }) {
     }
   ]);
 
-  const quitadosVisiveis = filtroCS === 'Todos' 
-    ? quitados 
-    : quitados.filter(q => q.cs === filtroCS);
+  const username = "Edu crabbe"; // Usuário logado
+  
+  let quitadosVisiveis = quitados;
+  if (isManager) {
+    if (filtroCS !== 'Todos') {
+      quitadosVisiveis = quitados.filter(q => q.cs === filtroCS);
+    }
+  } else {
+    quitadosVisiveis = quitados.filter(q => q.cs === username);
+  }
 
   // Calculando totais
   const totalOriginal = quitadosVisiveis.reduce((acc, curr) => acc + curr.valorOriginal, 0);

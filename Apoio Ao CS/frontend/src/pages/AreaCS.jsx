@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, User, PhoneForwarded, PieChart } from 'lucide-react';
+import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, Users, User, PhoneForwarded, PieChart } from 'lucide-react';
 
 export default function AreaCS() {
   const username = "educrabbe"; 
@@ -22,8 +22,10 @@ export default function AreaCS() {
   const fetchClientes = async () => {
     try {
       const res = await fetch(`${API_URL}/clientes?user=${username}`);
-      const data = await res.json();
-      setClientes(data.clientes || []);
+      if (res.ok) {
+        const data = await res.json();
+        setClientes(data.clientes || []);
+      }
     } catch (e) {
       console.error(e);
     }
