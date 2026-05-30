@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, User } from 'lucide-react';
 
 export default function AreaCS() {
-  const [clientes, setClientes] = useState([
-    { id: '1002345-67', nome: 'Eduardo Crabbe', uf: 'SP', contrato: 'Veículo', processos: 'Sim', criticidade: 'Crítico', contatos: 0, status: 'Ativo', ultimoContato: null },
-    { id: '1002346-68', nome: 'Ana Souza', uf: 'RJ', contrato: 'Empréstimo', processos: 'Não', criticidade: 'Atenção', contatos: 2, status: 'Ativo', ultimoContato: Date.now() - (70 * 60 * 60 * 1000) },
-    { id: '1002347-69', nome: 'Carlos Silva', uf: 'MG', contrato: 'Veículo', processos: 'Não', criticidade: 'Regular', contatos: 5, status: 'Ativo', ultimoContato: null },
-  ]);
+  // Simulação de usuário logado
+  const username = "educrabbe"; 
+  const API_URL = "http://127.0.0.1:8000/api/areacs";
 
+  const [clientes, setClientes] = useState([]);
   const [busca, setBusca] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('Todos');
   const [now, setNow] = useState(Date.now());
@@ -15,45 +14,93 @@ export default function AreaCS() {
   const [modalQuitar, setModalQuitar] = useState(null);
   const [datasQuitar, setDatasQuitar] = useState({ dataBoleto: '', dataPagamento: '' });
 
-  // Atualizar o relógio para os timers
   useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 60000); // Atualiza a cada 1 minuto
+    fetchClientes();
+    const interval = setInterval(() => setNow(Date.now()), 60000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleAtendimento = (id) => {
-    setClientes(clientes.map(c => {
-      if (c.id === id && c.contatos < 6) {
-        return { ...c, contatos: c.contatos + 1, ultimoContato: Date.now() };
-      }
-      return c;
-    }));
+  const fetchClientes = async () => {
+    try {
+      const res = await fetch(`${API_URL}/clientes?user=${username}`);
+      const data = await res.json();
+      setClientes(data.clientes || []);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const confirmarQuitar = (e) => {
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch(`${API_URL}/upload?user=${username}`, {
+        method: "POST",
+        body: formData
+      });
+      if (res.ok) {
+        alert("Planilha de clientes carregada com sucesso!");
+        fetchClientes();
+      } else {
+        alert("Erro ao carregar planilha.");
+      }
+    } catch (e) {
+      alert("Erro de conexão.");
+    }
+  };
+
+  const handleAtendimento = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/atendimento/${id}?user=${username}`, { method: "POST" });
+      if (res.ok) {
+        fetchClientes();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const confirmarQuitar = async (e) => {
     e.preventDefault();
     if (!datasQuitar.dataBoleto || !datasQuitar.dataPagamento) return;
     
-    setClientes(clientes.map(c => {
-      if (c.id === modalQuitar.id) {
-        return { ...c, status: 'Quitado', dataBoleto: datasQuitar.dataBoleto, dataPagamento: datasQuitar.dataPagamento };
+    try {
+      const res = await fetch(`${API_URL}/quitar/${modalQuitar.id}?user=${username}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          codigo_dj: modalQuitar.id,
+          data_boleto: datasQuitar.dataBoleto, 
+          data_pagamento: datasQuitar.dataPagamento 
+        })
+      });
+      if (res.ok) {
+        fetchClientes();
+        setModalQuitar(null);
+        setDatasQuitar({ dataBoleto: '', dataPagamento: '' });
       }
-      return c;
-    }));
-    setModalQuitar(null);
-    setDatasQuitar({ dataBoleto: '', dataPagamento: '' });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleChangeField = (id, field, valor) => {
-    setClientes(clientes.map(c => {
-      if (c.id === id) {
-        return { ...c, [field]: valor };
+  const handleChangeField = async (id, field, valor) => {
+    try {
+      const res = await fetch(`${API_URL}/cliente/${id}?user=${username}&campo=${field}&valor=${valor}`, {
+        method: "PUT"
+      });
+      if (res.ok) {
+        fetchClientes();
       }
-      return c;
-    }));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  // Filtrar por Status, Busca Rápida (Nome/ID) e Tipo
   const clientesVisiveis = clientes.filter(c => {
     if (c.status !== 'Ativo') return false;
     if (filtroTipo !== 'Todos' && c.contrato !== filtroTipo) return false;
@@ -70,7 +117,7 @@ export default function AreaCS() {
   const getCriticidadeStyle = (nivel) => {
     if (nivel === 'Crítico') return 'bg-red-50 text-red-700 border-red-200';
     if (nivel === 'Atenção') return 'bg-amber-50 text-amber-700 border-amber-200';
-    return 'bg-blue-50 text-blue-700 border-blue-200'; // Regular
+    return 'bg-blue-50 text-blue-700 border-blue-200';
   };
 
   return (
@@ -81,14 +128,11 @@ export default function AreaCS() {
           <p className="text-brand-bronze mt-1">Gerencie sua lista, filtre contratos e registre atendimentos.</p>
         </div>
         <div className="flex gap-3">
-          <button className="bg-white border border-slate-200 text-brand-navy px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 flex items-center gap-2 transition-colors">
+          <label className="bg-white border border-slate-200 text-brand-navy px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 flex items-center gap-2 transition-colors cursor-pointer">
             <UploadCloud className="w-5 h-5 text-brand-bronze" />
             Importar Planilha
-          </button>
-          <button className="bg-brand-navy text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-blue-900 flex items-center gap-2 transition-colors">
-            <Plus className="w-5 h-5 text-brand-gold" />
-            Adicionar Cliente
-          </button>
+            <input type="file" accept=".xlsx" className="hidden" onChange={handleFileUpload} />
+          </label>
         </div>
       </header>
       
@@ -155,7 +199,6 @@ export default function AreaCS() {
                   }
                 }
 
-                // Row background highlight for critical clients
                 const isCritical = cliente.criticidade === 'Crítico';
 
                 return (
@@ -228,7 +271,7 @@ export default function AreaCS() {
           
           {clientesVisiveis.length === 0 && (
             <div className="p-12 text-center text-slate-500">
-              <p>Nenhum cliente encontrado com os filtros atuais.</p>
+              <p>Nenhum cliente cadastrado. Importe sua planilha do DataJuri.</p>
             </div>
           )}
         </div>
