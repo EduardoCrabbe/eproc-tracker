@@ -60,18 +60,18 @@ export default function Quitacoes({ role }) {
     <div className="space-y-6 pb-12">
       <header className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-brand-navy">Quitações</h2>
+          <h2 className="text-3xl font-bold text-brand-navy dark:text-white">Quitações</h2>
           <p className="text-brand-bronze mt-1">Relatório detalhado e acompanhamento de clientes liquidados.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           
           {isManager && (
-            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-sm">
+            <div className="flex items-center gap-2 bg-white dark:bg-[#112240] border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 shadow-sm">
               <Filter className="w-4 h-4 text-brand-bronze" />
               <select 
                 value={filtroCS}
                 onChange={(e) => setFiltroCS(e.target.value)}
-                className="text-sm text-brand-navy font-bold focus:outline-none bg-transparent cursor-pointer"
+                className="text-sm text-brand-navy dark:text-white font-bold focus:outline-none bg-transparent cursor-pointer"
               >
                 <option value="Todos">Todos os CSs</option>
                 <option value="Edu crabbe">Edu crabbe</option>
@@ -80,7 +80,7 @@ export default function Quitacoes({ role }) {
             </div>
           )}
 
-          <button className="bg-brand-gold text-brand-navy px-4 py-2 rounded-xl font-bold shadow-md hover:bg-[#b8952b] flex items-center gap-2 transition-all">
+          <button className="bg-brand-gold text-brand-navy dark:text-white px-4 py-2 rounded-xl font-bold shadow-md hover:bg-[#b8952b] flex items-center gap-2 transition-all">
             <Download className="w-5 h-5" />
             Exportar
           </button>
@@ -99,10 +99,10 @@ export default function Quitacoes({ role }) {
         </div>
       </header>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden overflow-x-auto">
+      <div className="bg-white dark:bg-[#112240] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[1200px]">
           <thead>
-            <tr className="bg-brand-cream border-b border-slate-100 text-brand-bronze text-[10px] uppercase tracking-wider">
+            <tr className="bg-brand-cream dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 text-brand-bronze text-[10px] uppercase tracking-wider">
               <th className="px-4 py-3 font-bold">Cliente / CS</th>
               <th className="px-4 py-3 font-bold">Valores (Original / Pago)</th>
               <th className="px-4 py-3 font-bold">Economia Gerada</th>
@@ -119,14 +119,14 @@ export default function Quitacoes({ role }) {
               const economiaPct = item.valorOriginal > 0 ? ((economiaReal / item.valorOriginal) * 100).toFixed(1) : 0;
 
               return (
-                <tr key={index} className="hover:bg-slate-50 transition-colors">
+                <tr key={index} className="hover:bg-slate-50 dark:bg-[#0B192C] transition-colors">
                   <td className="px-4 py-3">
-                    <div className="text-sm font-bold text-brand-navy">{item.cliente}</div>
+                    <div className="text-sm font-bold text-brand-navy dark:text-white">{item.cliente}</div>
                     <div className="text-xs text-brand-bronze font-medium">Resp: {item.cs}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="text-xs text-slate-500 line-through">R$ {item.valorOriginal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                    <div className="text-sm font-bold text-brand-navy">R$ {item.valorPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 line-through">R$ {item.valorOriginal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                    <div className="text-sm font-bold text-brand-navy dark:text-white">R$ {item.valorPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="text-sm font-bold text-emerald-600">R$ {economiaReal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
@@ -135,20 +135,20 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.consultaProcesso}
-                      className="text-xs border border-slate-200 rounded p-1 text-slate-700 bg-white focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 bg-white dark:bg-[#112240] focus:outline-none"
                     >
                       <option value="Ativa">Ativa</option>
                       <option value="Excluída">Excluída</option>
                     </select>
                   </td>
-                  <td className="px-4 py-3 text-xs text-slate-600">
+                  <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-300">
                     <div><span className="font-medium text-slate-400">Envio:</span> {item.dataBoleto}</div>
                     <div><span className="font-medium text-slate-400">Pgto:</span> {item.dataPagamento}</div>
                   </td>
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.protesto}
-                      className="text-xs border border-slate-200 rounded p-1 text-slate-700 bg-white focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 bg-white dark:bg-[#112240] focus:outline-none"
                     >
                       <option value="Não possui">Não possui</option>
                       <option value="Cliente ciente">Cliente ciente</option>
@@ -157,7 +157,7 @@ export default function Quitacoes({ role }) {
                   <td className="px-4 py-3">
                     <select 
                       defaultValue={item.tarifasRestituiveis}
-                      className="text-xs border border-slate-200 rounded p-1 text-slate-700 bg-white focus:outline-none"
+                      className="text-xs border border-slate-200 dark:border-slate-700 rounded p-1 text-slate-700 bg-white dark:bg-[#112240] focus:outline-none"
                     >
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
@@ -174,20 +174,20 @@ export default function Quitacoes({ role }) {
           </tbody>
           {/* Rodapé com Totais */}
           {quitadosVisiveis.length > 0 && (
-            <tfoot className="bg-slate-50 border-t-2 border-slate-200">
+            <tfoot className="bg-slate-50 dark:bg-[#0B192C] border-t-2 border-slate-200 dark:border-slate-700">
               <tr>
-                <td className="px-4 py-4 text-sm font-bold text-slate-600 flex items-center gap-2">
+                <td className="px-4 py-4 text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Calculator className="w-4 h-4" /> TOTAL CONSOLIDADO
                 </td>
                 <td className="px-4 py-4">
-                  <div className="text-xs text-slate-500 line-through">R$ {totalOriginal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                  <div className="text-sm font-bold text-brand-navy">R$ {totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 line-through">R$ {totalOriginal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                  <div className="text-sm font-bold text-brand-navy dark:text-white">R$ {totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                 </td>
                 <td className="px-4 py-4">
                   <div className="text-sm font-bold text-emerald-600">R$ {totalEconomia.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                   <div className="text-xs font-bold text-white bg-emerald-500 inline-block px-2 py-0.5 rounded-full">{totalEconomiaPct}% Global</div>
                 </td>
-                <td colSpan={5} className="px-4 py-4 text-xs text-slate-500 text-right">
+                <td colSpan={5} className="px-4 py-4 text-xs text-slate-500 dark:text-slate-400 text-right">
                   Mostrando {quitadosVisiveis.length} quitações no período.
                 </td>
               </tr>
@@ -196,7 +196,7 @@ export default function Quitacoes({ role }) {
         </table>
         
         {quitadosVisiveis.length === 0 && (
-          <div className="p-12 text-center text-slate-500 flex flex-col items-center">
+          <div className="p-12 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center">
             <FileText className="w-12 h-12 text-slate-300 mb-4" />
             <p>Nenhum cliente quitado no momento.</p>
           </div>
