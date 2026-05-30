@@ -176,7 +176,7 @@ async def upload_planilha_crm(user: str = Query(...), file: UploadFile = File(..
         sheet_final = wb_final.active
         
         # Cabeçalhos do CRM
-        headers = ["Código DJ", "Cliente", "UF", "Tipo de contrato", "Processo?", "Criticidade", "Contatos", "Status", "Último Contato"]
+        headers = ["Código DJ", "Cliente", "UF", "Tipo de contrato", "Processo?", "Criticidade", "Contatos", "Tentativas", "Status", "Último Contato"]
         sheet_final.append(headers)
         
         for idx, row in enumerate(sheet_temp.iter_rows(values_only=True)):
@@ -203,10 +203,11 @@ async def upload_planilha_crm(user: str = Query(...), file: UploadFile = File(..
                 
             # Default values for new CRM logic
             criticidade = "Regular"
+            tentativas = 0
             status = "Ativo"
             ultimo_contato = ""
             
-            sheet_final.append([codigo_dj, cliente_formatado, uf, tipo_contrato, processos, criticidade, atendimentos, status, ultimo_contato])
+            sheet_final.append([codigo_dj, cliente_formatado, uf, tipo_contrato, processos, criticidade, atendimentos, tentativas, status, ultimo_contato])
             
         wb_final.save(caminho_final)
         os.remove(caminho_temporario)
@@ -239,8 +240,9 @@ def listar_clientes_crm(user: str):
                 "processos": str(row[4]),
                 "criticidade": str(row[5]),
                 "contatos": int(row[6] if row[6] is not None else 0),
-                "status": str(row[7]),
-                "ultimoContato": float(row[8]) if row[8] else None
+                "tentativas": int(row[7] if row[7] is not None else 0),
+                "status": str(row[8]),
+                "ultimoContato": float(row[9]) if row[9] else None
             })
         return {"clientes": clientes}
     except Exception as e:
@@ -263,7 +265,7 @@ def registrar_atendimento(codigo_dj: str, user: str):
                 contatos = int(contatos) if contatos is not None else 0
                 if contatos < 6:
                     sheet.cell(row=row_idx, column=7, value=contatos + 1)
-                    sheet.cell(row=row_idx, column=9, value=time.time() * 1000) # JS usa ms
+                    sheet.cell(row=row_idx, column=10, value=time.time() * 1000) # JS usa ms
                 atualizado = True
                 break
                 
@@ -288,7 +290,7 @@ def quitar_contrato(codigo_dj: str, payload: CRMQuitar, user: str):
         atualizado = False
         for row_idx in range(2, sheet.max_row + 1):
             if str(sheet.cell(row=row_idx, column=1).value) == str(codigo_dj):
-                sheet.cell(row=row_idx, column=8, value="Quitado")
+                sheet.cell(row=row_idx, column=9, value="Quitado")
                 atualizado = True
                 break
                 
@@ -319,6 +321,103 @@ def atualizar_cliente(codigo_dj: str, user: str, campo: str = Query(...), valor:
                 break
         wb.save(planilha_path)
         return {"message": "Cliente atualizado."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/areacs/tentativa/{codigo_dj}")
+def registrar_tentativa(codigo_dj: str, user: str):
+    planilha_path = get_crm_file(user)
+    if not os.path.exists(planilha_path):
+        raise HTTPException(status_code=404, detail="Planilha não encontrada.")
+        
+    try:
+        wb = load_workbook(planilha_path)
+        sheet = wb.active
+        
+        atualizado = False
+        for row_idx in range(2, sheet.max_row + 1):
+            if str(sheet.cell(row=row_idx, column=1).value) == str(codigo_dj):
+                tentativas = sheet.cell(row=row_idx, column=8).value
+                tentativas = int(tentativas) if tentativas is not None else 0
+                sheet.cell(row=row_idx, column=8, value=tentativas + 1)
+                atualizado = True
+                break
+                
+        if atualizado:
+            wb.save(planilha_path)
+            return {"message": "Tentativa registrada."}
+        else:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/dashboard/stats")
+def dashboard_stats(user: str):
+    planilha_path = get_crm_file(user)
+    if not os.path.exists(planilha_path):
+        return {
+            "naoAtendidos": 0, "naoAtendidosPct": 0,
+            "tentativas": 0,
+            "atendidos": 0, "atendidosPct": 0,
+            "ganhosTotais": 0,
+            "prioridades": []
+        }
+        
+    try:
+        wb = load_workbook(planilha_path, data_only=True)
+        sheet = wb.active
+        
+        total_clientes = 0
+        atendidos = 0
+        tentativas_totais = 0
+        prioridades = []
+        
+        VALOR_COMISSAO_POR_ATENDIMENTO = 5.00 # Exemplo: 5 reais por atendimento
+        ganhos_totais = 0.0
+        
+        for idx, row in enumerate(sheet.iter_rows(values_only=True)):
+            if idx == 0:
+                continue
+            
+            status = str(row[8] if len(row) > 8 and row[8] is not None else "Ativo")
+            if status != "Ativo":
+                continue # Focar apenas nos ativos
+                
+            total_clientes += 1
+            codigo_dj = str(row[0])
+            nome = str(row[1])
+            criticidade = str(row[5])
+            contatos = int(row[6] if row[6] is not None else 0)
+            tentativas = int(row[7] if row[7] is not None else 0)
+            ultimo_contato = float(row[9]) if len(row) > 9 and row[9] else None
+            
+            tentativas_totais += tentativas
+            
+            if contatos > 0:
+                atendidos += 1
+                ganhos_totais += (contatos * VALOR_COMISSAO_POR_ATENDIMENTO)
+                
+            if criticidade in ["Crítico", "Atenção"]:
+                prioridades.append({
+                    "id": codigo_dj,
+                    "nome": nome,
+                    "criticidade": criticidade,
+                    "ultimoContato": ultimo_contato
+                })
+                
+        nao_atendidos = total_clientes - atendidos
+        
+        pct_atendidos = round((atendidos / total_clientes * 100), 1) if total_clientes > 0 else 0
+        pct_nao_atendidos = round((nao_atendidos / total_clientes * 100), 1) if total_clientes > 0 else 0
+        
+        return {
+            "totalClientes": total_clientes,
+            "naoAtendidos": nao_atendidos, "naoAtendidosPct": pct_nao_atendidos,
+            "tentativas": tentativas_totais,
+            "atendidos": atendidos, "atendidosPct": pct_atendidos,
+            "ganhosTotais": ganhos_totais,
+            "prioridades": prioridades
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

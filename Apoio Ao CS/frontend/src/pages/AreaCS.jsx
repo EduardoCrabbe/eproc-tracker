@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, User } from 'lucide-react';
+import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, User, PhoneForwarded, PieChart } from 'lucide-react';
 
 export default function AreaCS() {
-  // Simulação de usuário logado
   const username = "educrabbe"; 
   const API_URL = "http://127.0.0.1:8000/api/areacs";
 
@@ -56,9 +55,16 @@ export default function AreaCS() {
   const handleAtendimento = async (id) => {
     try {
       const res = await fetch(`${API_URL}/atendimento/${id}?user=${username}`, { method: "POST" });
-      if (res.ok) {
-        fetchClientes();
-      }
+      if (res.ok) fetchClientes();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleTentativa = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/tentativa/${id}?user=${username}`, { method: "POST" });
+      if (res.ok) fetchClientes();
     } catch (e) {
       console.error(e);
     }
@@ -93,9 +99,7 @@ export default function AreaCS() {
       const res = await fetch(`${API_URL}/cliente/${id}?user=${username}&campo=${field}&valor=${valor}`, {
         method: "PUT"
       });
-      if (res.ok) {
-        fetchClientes();
-      }
+      if (res.ok) fetchClientes();
     } catch (e) {
       console.error(e);
     }
@@ -104,15 +108,19 @@ export default function AreaCS() {
   const clientesVisiveis = clientes.filter(c => {
     if (c.status !== 'Ativo') return false;
     if (filtroTipo !== 'Todos' && c.contrato !== filtroTipo) return false;
-    
     if (busca) {
       const termo = busca.toLowerCase();
-      if (!c.nome.toLowerCase().includes(termo) && !c.id.toLowerCase().includes(termo)) {
-        return false;
-      }
+      if (!c.nome.toLowerCase().includes(termo) && !c.id.toLowerCase().includes(termo)) return false;
     }
     return true;
   });
+
+  // Calculos da Tela Area CS
+  const totalAtivos = clientes.filter(c => c.status === 'Ativo').length;
+  const atendidos = clientes.filter(c => c.status === 'Ativo' && c.contatos > 0).length;
+  const naoAtendidos = totalAtivos - atendidos;
+  const pctAtendidos = totalAtivos > 0 ? Math.round((atendidos / totalAtivos) * 100) : 0;
+  const pctNaoAtendidos = totalAtivos > 0 ? Math.round((naoAtendidos / totalAtivos) * 100) : 0;
 
   const getCriticidadeStyle = (nivel) => {
     if (nivel === 'Crítico') return 'bg-red-50 text-red-700 border-red-200';
@@ -125,7 +133,7 @@ export default function AreaCS() {
       <header className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold text-brand-navy">Meus Clientes</h2>
-          <p className="text-brand-bronze mt-1">Gerencie sua lista, filtre contratos e registre atendimentos.</p>
+          <p className="text-brand-bronze mt-1">Gerencie sua lista, filtre contratos e registre atendimentos e tentativas.</p>
         </div>
         <div className="flex gap-3">
           <label className="bg-white border border-slate-200 text-brand-navy px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 flex items-center gap-2 transition-colors cursor-pointer">
@@ -135,10 +143,39 @@ export default function AreaCS() {
           </label>
         </div>
       </header>
+
+      {/* Mini-Dashboard AreaCS */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="p-3 bg-blue-50 text-blue-500 rounded-lg"><Users className="w-5 h-5" /></div>
+          <div>
+            <p className="text-xs text-slate-500 font-bold">Total de Clientes</p>
+            <p className="text-2xl font-black text-brand-navy">{totalAtivos}</p>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="p-3 bg-emerald-50 text-emerald-500 rounded-lg"><PieChart className="w-5 h-5" /></div>
+          <div>
+            <p className="text-xs text-slate-500 font-bold">Atendidos</p>
+            <p className="text-2xl font-black text-emerald-600">{atendidos} <span className="text-sm font-medium text-slate-400">({pctAtendidos}%)</span></p>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="p-3 bg-rose-50 text-rose-500 rounded-lg"><AlertOctagon className="w-5 h-5" /></div>
+          <div>
+            <p className="text-xs text-slate-500 font-bold">Não Atendidos</p>
+            <p className="text-2xl font-black text-rose-600">{naoAtendidos} <span className="text-sm font-medium text-slate-400">({pctNaoAtendidos}%)</span></p>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-center">
+          <p className="text-xs text-slate-500 font-bold mb-2">Progresso da Base</p>
+          <div className="w-full bg-slate-100 rounded-full h-2.5">
+            <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: `${pctAtendidos}%` }}></div>
+          </div>
+        </div>
+      </div>
       
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        
-        {/* Barra de Filtros e Busca Rápida */}
         <div className="p-4 border-b border-slate-100 bg-slate-50 flex flex-col md:flex-row items-center gap-4">
           <div className="flex-1 w-full relative">
             <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -173,14 +210,13 @@ export default function AreaCS() {
                 <th className="px-4 py-4 font-bold">Nome do Cliente</th>
                 <th className="px-4 py-4 font-bold">Criticidade</th>
                 <th className="px-4 py-4 font-bold">Contrato / Proc.</th>
-                <th className="px-4 py-4 font-bold text-center">Cliente Atendido</th>
+                <th className="px-4 py-4 font-bold text-center">Atendimento</th>
+                <th className="px-4 py-4 font-bold text-center">Tentativas</th>
                 <th className="px-4 py-4 font-bold text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {clientesVisiveis.map((cliente) => {
-                
-                // Lógica do Timer de 72h
                 let isBlocked = false;
                 let timerDisplay = null;
                 
@@ -238,6 +274,7 @@ export default function AreaCS() {
                         </select>
                       </div>
                     </td>
+                    
                     <td className="px-4 py-4 text-center">
                       <button 
                         onClick={() => handleAtendimento(cliente.id)}
@@ -245,7 +282,7 @@ export default function AreaCS() {
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold border transition-all ${isBlocked ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-brand-cream text-brand-navy border-brand-gold hover:bg-brand-gold hover:text-white shadow-sm hover:shadow'}`}
                       >
                         <MessageCircle className="w-4 h-4" />
-                        {cliente.contatos > 0 ? `+${cliente.contatos}` : 'Atender'}
+                        {cliente.contatos > 0 ? `Atendido (${cliente.contatos})` : 'Atender'}
                       </button>
                       {isBlocked && (
                         <p className={`text-[10px] font-bold mt-1 flex items-center justify-center gap-1 ${cliente.contatos >= 6 ? 'text-slate-400' : 'text-amber-600'}`}>
@@ -254,6 +291,18 @@ export default function AreaCS() {
                         </p>
                       )}
                     </td>
+                    
+                    <td className="px-4 py-4 text-center">
+                      <button 
+                        onClick={() => handleTentativa(cliente.id)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 text-slate-600 bg-white hover:bg-slate-100 hover:text-slate-800 transition-all shadow-sm"
+                        title="Marcar tentativa sem retorno"
+                      >
+                        <PhoneForwarded className="w-4 h-4 text-orange-500" />
+                        {cliente.tentativas > 0 ? `+${cliente.tentativas}` : 'Tentativa'}
+                      </button>
+                    </td>
+
                     <td className="px-4 py-4 text-right">
                       <button 
                         onClick={() => setModalQuitar(cliente)}
