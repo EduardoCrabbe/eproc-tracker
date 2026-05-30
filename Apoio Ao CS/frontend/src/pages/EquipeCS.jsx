@@ -1,11 +1,47 @@
-import React from 'react';
-import { Users, TrendingUp, Award, UserPlus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, TrendingUp, Award, UserPlus, X } from 'lucide-react';
 
 export default function EquipeCS() {
-  const equipe = [
-    { id: 1, nome: 'Edu crabbe', email: 'eduardo@reisrevisional.com.br', nivel: 1, totalClientes: 100, atendidos: 60, quitacoes: 4, comentarios: 12, ganhos: 345.50 },
-    { id: 2, nome: 'Ana Souza', email: 'ana@reisrevisional.com.br', nivel: 3, totalClientes: 120, atendidos: 100, quitacoes: 8, comentarios: 20, ganhos: 850.00 }
-  ];
+  const [equipe, setEquipe] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [novoCS, setNovoCS] = useState({ nome: '', email: '', nivel: 1 });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('equipeCS');
+    if (saved) {
+      setEquipe(JSON.parse(saved));
+    } else {
+      const defaultEquipe = [
+        { id: 1, nome: 'Edu crabbe', email: 'eduardo@reisrevisional.com.br', nivel: 1, totalClientes: 100, atendidos: 60, quitacoes: 4, comentarios: 12, ganhos: 345.50 },
+        { id: 2, nome: 'Ana Souza', email: 'ana@reisrevisional.com.br', nivel: 3, totalClientes: 120, atendidos: 100, quitacoes: 8, comentarios: 20, ganhos: 850.00 }
+      ];
+      setEquipe(defaultEquipe);
+      localStorage.setItem('equipeCS', JSON.stringify(defaultEquipe));
+    }
+  }, []);
+
+  const handleAddCS = (e) => {
+    e.preventDefault();
+    if (!novoCS.nome || !novoCS.email) return;
+
+    const newCsEntry = {
+      id: Date.now(),
+      nome: novoCS.nome,
+      email: novoCS.email,
+      nivel: Number(novoCS.nivel),
+      totalClientes: 0,
+      atendidos: 0,
+      quitacoes: 0,
+      comentarios: 0,
+      ganhos: 0.0
+    };
+
+    const updatedEquipe = [...equipe, newCsEntry];
+    setEquipe(updatedEquipe);
+    localStorage.setItem('equipeCS', JSON.stringify(updatedEquipe));
+    setIsModalOpen(false);
+    setNovoCS({ nome: '', email: '', nivel: 1 });
+  };
 
   return (
     <div className="space-y-6">
@@ -19,7 +55,10 @@ export default function EquipeCS() {
             <TrendingUp className="w-5 h-5" />
             Adicionar Campanha
           </button>
-          <button className="bg-brand-navy text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-blue-900 flex items-center gap-2 transition-colors">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-brand-navy text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-blue-900 flex items-center gap-2 transition-colors"
+          >
             <UserPlus className="w-5 h-5 text-brand-gold" />
             Adicionar CS
           </button>
@@ -107,6 +146,79 @@ export default function EquipeCS() {
           </tbody>
         </table>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="bg-brand-cream dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700 p-4 flex justify-between items-center">
+              <h3 className="font-bold text-brand-navy dark:text-white text-lg flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-brand-gold" />
+                Cadastrar Novo CS
+              </h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:text-slate-300">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddCS} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">Nome Completo</label>
+                <input 
+                  type="text"
+                  required
+                  value={novoCS.nome}
+                  onChange={e => setNovoCS({...novoCS, nome: e.target.value})}
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#112240] dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-brand-navy transition-colors"
+                  placeholder="Ex: Carlos Oliveira"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">E-mail</label>
+                <input 
+                  type="email"
+                  required
+                  value={novoCS.email}
+                  onChange={e => setNovoCS({...novoCS, email: e.target.value})}
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#112240] dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-brand-navy transition-colors"
+                  placeholder="Ex: carlos@reisrevisional.com.br"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">Nível de Comissionamento</label>
+                <select
+                  value={novoCS.nivel}
+                  onChange={e => setNovoCS({...novoCS, nivel: e.target.value})}
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#112240] dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-brand-navy transition-colors cursor-pointer"
+                >
+                  <option value={1}>Nível 1 (Iniciante)</option>
+                  <option value={2}>Nível 2 (Intermediário)</option>
+                  <option value={3}>Nível 3 (Avançado)</option>
+                  <option value={4}>Nível 4 (Sênior)</option>
+                  <option value={5}>Nível 5 (Especialista)</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 bg-slate-100 text-slate-600 dark:text-slate-300 dark:bg-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 bg-brand-navy text-white font-bold py-3 rounded-xl hover:bg-blue-900 shadow-md transition-colors"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
