@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, Users, User, PhoneForwarded, PieChart } from 'lucide-react';
+import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, Users, User, PhoneForwarded, PieChart, Trash2 } from 'lucide-react';
 
 export default function AreaCS() {
   const username = "educrabbe"; 
@@ -55,29 +55,49 @@ export default function AreaCS() {
   };
 
   const handleAtendimento = async (id) => {
+    // Atualização otimista para a apresentação
+    setClientes(prev => prev.map(c => c.id === id ? { ...c, contatos: (c.contatos || 0) + 1, ultimoContato: Date.now() } : c));
     try {
       const res = await fetch(`${API_URL}/atendimento/${id}?user=${username}`, { method: "POST" });
       if (res.ok) fetchClientes();
     } catch (e) {
-      console.error(e);
+      console.error('Backend offline, usando estado local.');
     }
   };
 
   const handleDesfazerAtendimento = async (id) => {
+    // Atualização otimista para a apresentação
+    setClientes(prev => prev.map(c => c.id === id ? { ...c, contatos: Math.max(0, (c.contatos || 0) - 1) } : c));
     try {
       const res = await fetch(`${API_URL}/atendimento/${id}?user=${username}`, { method: "DELETE" });
       if (res.ok) fetchClientes();
     } catch (e) {
-      console.error(e);
+      console.error('Backend offline, usando estado local.');
     }
   };
 
   const handleTentativa = async (id) => {
+    // Atualização otimista
+    setClientes(prev => prev.map(c => c.id === id ? { ...c, tentativas: (c.tentativas || 0) + 1 } : c));
     try {
       const res = await fetch(`${API_URL}/tentativa/${id}?user=${username}`, { method: "POST" });
       if (res.ok) fetchClientes();
     } catch (e) {
-      console.error(e);
+      console.error('Backend offline, usando estado local.');
+    }
+  };
+
+  const handleExcluirCliente = async (id) => {
+    if (!window.confirm('Tem certeza que deseja excluir este cliente permanentemente?')) return;
+    
+    // Atualização otimista
+    setClientes(prev => prev.filter(c => c.id !== id));
+    try {
+      // Endpoint fictício para o backend futuro
+      const res = await fetch(`${API_URL}/cliente/${id}?user=${username}`, { method: "DELETE" });
+      if (res.ok) fetchClientes();
+    } catch (e) {
+      console.error('Backend offline, exclusão feita no estado local.');
     }
   };
 
@@ -327,13 +347,22 @@ export default function AreaCS() {
                     </td>
 
                     <td className="px-4 py-4 text-right">
-                      <button 
-                        onClick={() => setModalQuitar(cliente)}
-                        className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-500 hover:text-white border border-emerald-200 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition-all"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        Quitar
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => setModalQuitar(cliente)}
+                          className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-500 hover:text-white border border-emerald-200 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition-all"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          Quitar
+                        </button>
+                        <button 
+                          onClick={() => handleExcluirCliente(cliente.id)}
+                          className="p-1.5 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white border border-red-200 rounded-lg shadow-sm transition-all"
+                          title="Excluir Cliente"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
