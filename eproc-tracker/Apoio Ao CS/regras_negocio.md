@@ -16,6 +16,7 @@ O backend calculará a comissão automaticamente com base no tipo de evento e no
 
 | Tipo de Ação                           | CS Níveis 1 e 2 | CS Níveis 3, 4 e 5 |
 | :------------------------------------- | :-------------- | :----------------- |
+| **Atendimento de Rotina**              | R$ 1,00         | R$ 1,50            |
 | **Quitação**                           | R$ 5,00         | R$ 10,00           |
 | **Comentário Google (Positivo)**       | R$ 5,00         | R$ 10,00           |
 | **Foto com Boleto (Quitação)**         | R$ 5,00         | R$ 10,00           |

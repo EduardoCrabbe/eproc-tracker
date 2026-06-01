@@ -6,13 +6,23 @@ import os
 import sys
 import threading
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-EPROC_DIR = os.path.join(BASE_DIR, "eproc_consultant")
-UPLOADS_DIR = os.path.join(BASE_DIR, "platform_manager", "uploads")
+if getattr(sys, 'frozen', False):
+    # Se for o executável compilado, BASE_DIR é a pasta onde o .exe está
+    BASE_DIR = os.path.dirname(sys.executable)
+    EPROC_DIR = os.path.join(sys._MEIPASS, "eproc_consultant")
+    UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
+else:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    EPROC_DIR = os.path.join(BASE_DIR, "eproc_consultant")
+    UPLOADS_DIR = os.path.join(BASE_DIR, "platform_manager", "uploads")
+
 sys.path.append(EPROC_DIR)
 
 if not os.path.exists(UPLOADS_DIR):
-    os.makedirs(UPLOADS_DIR)
+    try:
+        os.makedirs(UPLOADS_DIR)
+    except:
+        pass
 
 try:
     from test_scraper import run_tests
@@ -495,4 +505,31 @@ def dashboard_stats(user: str, csLevels: str = Query(None)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    import webbrowser
+    import threading
+    import time
+    from fastapi.staticfiles import StaticFiles
+
+    # Determinar caminho base correto para PyInstaller (sys._MEIPASS) ou modo Dev
+    if getattr(sys, 'frozen', False):
+        base_dir = sys._MEIPASS
+    else:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        
+    dist_dir = os.path.join(base_dir, "dist")
+    
+    # Se a pasta dist existir (compilação React), monta no root
+    if os.path.exists(dist_dir):
+        app.mount("/", StaticFiles(directory=dist_dir, html=True), name="static")
+
+    def open_browser():
+        time.sleep(1.5)
+        webbrowser.open("http://127.0.0.1:8000")
+
+    if getattr(sys, 'frozen', False):
+        # Modo EXE: não use reload, abra o navegador
+        threading.Thread(target=open_browser, daemon=True).start()
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+    else:
+        # Modo Dev: use reload
+        uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
