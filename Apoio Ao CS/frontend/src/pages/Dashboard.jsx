@@ -205,18 +205,50 @@ export default function Dashboard({ role }) {
               </div>
             ) : (
               stats.prioridades.map((item) => {
-                const isAtrasado = true; // Simplified for display
+                let statusText = "Pendente";
+                let subText = "Atender o quanto antes";
+                let isAtrasado = true;
+                
+                if (item.ultimoContato) {
+                  const limitDays = item.criticidade === 'Crítico' ? 7 : 15;
+                  const limitMs = limitDays * 24 * 60 * 60 * 1000;
+                  const elapsedMs = now - item.ultimoContato;
+                  const remainingMs = limitMs - elapsedMs;
+
+                  if (remainingMs <= 0) {
+                    statusText = "Atrasado";
+                    subText = "Prazo esgotado";
+                    isAtrasado = true;
+                  } else {
+                    const remainingDays = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
+                    const remainingHours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    
+                    if (remainingDays > 0) {
+                      statusText = `${remainingDays} dia${remainingDays !== 1 ? 's' : ''}`;
+                    } else {
+                      statusText = `${remainingHours}h restantes`;
+                    }
+                    subText = "No prazo";
+                    isAtrasado = false;
+                  }
+                }
+
+                const borderColor = item.criticidade === 'Crítico' ? 'border-l-red-500' : 'border-l-amber-500';
+                const statusColor = isAtrasado ? 'text-red-500 dark:text-red-400' : 'text-emerald-500 dark:text-emerald-400';
+
                 return (
-                  <div key={item.id} className="bg-white dark:bg-[#112240] p-4 rounded-xl shadow-sm border-l-4 border-l-red-500 border-t border-r border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                  <div key={item.id} className={`bg-white dark:bg-[#112240] p-4 rounded-xl shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-slate-100 dark:border-slate-800 flex justify-between items-center`}>
                     <div>
                       <h4 className="font-bold text-brand-navy dark:text-white">{item.nome}</h4>
-                      <span className="text-xs font-bold text-red-500 uppercase">{item.criticidade}</span>
+                      <span className={`text-xs font-bold uppercase ${item.criticidade === 'Crítico' ? 'text-red-500' : 'text-amber-500'}`}>
+                        {item.criticidade} ({item.criticidade === 'Crítico' ? 'Semanal' : 'Quinzenal'})
+                      </span>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                        {item.ultimoContato ? 'Atrasado' : 'Atrasado'}
+                      <div className={`text-sm font-black ${statusColor}`}>
+                        {statusText}
                       </div>
-                      <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase">Tempo Restante</div>
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold">{subText}</div>
                     </div>
                   </div>
                 )
