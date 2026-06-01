@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, AlertOctagon, AlertTriangle, CheckCircle2, Search, PlusCircle, Calendar as CalendarIcon, Clock, Filter, AlertCircle, RefreshCw, PhoneForwarded, DollarSign, BellRing } from 'lucide-react';
+import { Users, AlertOctagon, AlertTriangle, CheckCircle2, Search, PlusCircle, Calendar as CalendarIcon, Clock, Filter, AlertCircle, RefreshCw, PhoneForwarded, DollarSign, BellRing, PieChart } from 'lucide-react';
 
 export default function Dashboard({ role }) {
   const isManager = role === 'Gerente' || role === 'Supervisor';
@@ -104,6 +104,12 @@ export default function Dashboard({ role }) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
 
+  const totalChart = stats.atendidos + stats.naoAtendidos + stats.tentativas;
+  const p1 = totalChart > 0 ? (stats.atendidos / totalChart) * 100 : 0;
+  const p2 = totalChart > 0 ? (stats.tentativas / totalChart) * 100 : 0;
+  const stop1 = p1;
+  const stop2 = p1 + p2;
+
   return (
     <div className="space-y-8 pb-12">
       {/* Tarja de Alertas Críticos (Eproc) */}
@@ -188,7 +194,7 @@ export default function Dashboard({ role }) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Radar de Prioridades */}
         <div className="space-y-4">
@@ -257,6 +263,65 @@ export default function Dashboard({ role }) {
           </div>
         </div>
 
+        {/* Gráfico de Desempenho */}
+        <div className="bg-white dark:bg-[#112240] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 flex flex-col">
+          <div>
+            <h3 className="font-bold text-brand-navy dark:text-white flex items-center gap-2 mb-1">
+              <PieChart className="w-5 h-5 text-brand-gold" />
+              Visão Geral
+            </h3>
+            <p className="text-xs text-slate-500 mb-6">Comparativo do ciclo atual</p>
+          </div>
+          
+          <div className="flex-1 flex justify-center items-center relative py-4">
+            {totalChart === 0 ? (
+              <div className="w-40 h-40 rounded-full bg-slate-100 dark:bg-slate-800 border-4 border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                <span className="text-xs font-bold text-slate-400">Sem dados</span>
+              </div>
+            ) : (
+              <div 
+                className="w-48 h-48 rounded-full flex items-center justify-center shadow-inner relative transition-all duration-500 hover:scale-105"
+                style={{
+                  background: `conic-gradient(
+                    #10b981 0% ${stop1}%,
+                    #f97316 ${stop1}% ${stop2}%,
+                    #ef4444 ${stop2}% 100%
+                  )`
+                }}
+              >
+                <div className="w-32 h-32 bg-white dark:bg-[#112240] rounded-full shadow-lg flex items-center justify-center flex-col z-10">
+                  <span className="text-2xl font-black text-brand-navy dark:text-white">{totalChart}</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-4 flex flex-col gap-3">
+            <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></div>
+                <span className="font-bold text-slate-600 dark:text-slate-300">Atendidos</span>
+              </div>
+              <span className="font-black text-emerald-500">{stats.atendidos}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-orange-500 shadow-sm"></div>
+                <span className="font-bold text-slate-600 dark:text-slate-300">Tentativas</span>
+              </div>
+              <span className="font-black text-orange-500">{stats.tentativas}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div>
+                <span className="font-bold text-slate-600 dark:text-slate-300">Não Atendidos</span>
+              </div>
+              <span className="font-black text-red-500">{stats.naoAtendidos}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Bloco de Notas */}
         <div className="bg-white dark:bg-[#112240] rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-brand-cream/50 dark:bg-slate-900/50 flex justify-between items-center">
@@ -266,7 +331,7 @@ export default function Dashboard({ role }) {
             </h3>
           </div>
           
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="p-6 grid grid-cols-1 gap-8">
             <div className="space-y-4">
               <form onSubmit={handleAddTarefa} className="space-y-4">
                 <div>
