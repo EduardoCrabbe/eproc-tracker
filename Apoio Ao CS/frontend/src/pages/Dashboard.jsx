@@ -12,7 +12,7 @@ export default function Dashboard({ role }) {
   const [stats, setStats] = useState({
     totalClientes: 0,
     naoAtendidos: 0, naoAtendidosPct: 0,
-    tentativas: 0,
+    tentativas: 0, tentativasPct: 0,
     atendidos: 0, atendidosPct: 0,
     ganhosTotais: 0,
     prioridades: []
@@ -324,7 +324,7 @@ export default function Dashboard({ role }) {
               </div>
               <div className="text-right">
                 <span className="font-black text-orange-500 mr-2">{stats.tentativas}</span>
-                <span className="text-xs font-bold text-slate-400">({totalChart > 0 ? ((stats.tentativas / totalChart) * 100).toFixed(1) : 0}%)</span>
+                <span className="text-xs font-bold text-slate-400">({stats.tentativasPct}%)</span>
               </div>
             </div>
             <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">

@@ -448,11 +448,11 @@ def dashboard_stats(user: str):
                 tentativas = int(row[7] if row[7] is not None else 0)
                 ultimo_contato = float(row[9]) if len(row) > 9 and row[9] else None
                 
-                tentativas_totais += tentativas
-                
                 if contatos > 0:
                     atendidos += 1
                     ganhos_totais += (contatos * VALOR_COMISSAO_POR_ATENDIMENTO)
+                elif tentativas > 0:
+                    tentativas_totais += 1
                     
                 if criticidade in ["Crítico", "Atenção"]:
                     # Extrair o nome do CS do arquivo (ex: atendimentos_educrabbe.xlsx -> educrabbe)
@@ -465,15 +465,16 @@ def dashboard_stats(user: str):
                         "cs": nome_cs
                     })
                 
-        nao_atendidos = total_clientes - atendidos
+        nao_atendidos = total_clientes - atendidos - tentativas_totais
         
         pct_atendidos = round((atendidos / total_clientes * 100), 1) if total_clientes > 0 else 0
+        pct_tentativas = round((tentativas_totais / total_clientes * 100), 1) if total_clientes > 0 else 0
         pct_nao_atendidos = round((nao_atendidos / total_clientes * 100), 1) if total_clientes > 0 else 0
         
         return {
             "totalClientes": total_clientes,
             "naoAtendidos": nao_atendidos, "naoAtendidosPct": pct_nao_atendidos,
-            "tentativas": tentativas_totais,
+            "tentativas": tentativas_totais, "tentativasPct": pct_tentativas,
             "atendidos": atendidos, "atendidosPct": pct_atendidos,
             "ganhosTotais": ganhos_totais,
             "prioridades": prioridades
