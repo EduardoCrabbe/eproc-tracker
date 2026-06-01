@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, Users, User, UserPlus, PhoneForwarded, PieChart, Trash2 } from 'lucide-react';
+import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, Users, User, UserPlus, PhoneForwarded, PieChart, Trash2, RotateCcw } from 'lucide-react';
 
 export default function AreaCS() {
   const username = "educrabbe"; 
@@ -135,6 +135,23 @@ export default function AreaCS() {
     }
   };
 
+  const handleResetMensal = async () => {
+    if (!window.confirm('Tem certeza que deseja zerar TODAS as quantidades de atendimentos e tentativas de TODOS os clientes? Essa ação não pode ser desfeita.')) return;
+    
+    // Otimista
+    setClientes(prev => prev.map(c => ({ ...c, contatos: 0, tentativas: 0, ultimoContato: null })));
+    
+    try {
+      const res = await fetch(`${API_URL}/reset?user=${username}`, { method: "POST" });
+      if (res.ok) {
+        alert("Reset mensal concluído com sucesso!");
+        fetchClientes();
+      }
+    } catch (e) {
+      console.error('Backend offline, reset feito localmente.');
+    }
+  };
+
   const confirmarQuitar = async (e) => {
     e.preventDefault();
     if (!datasQuitar.dataBoleto || !datasQuitar.dataPagamento) return;
@@ -203,6 +220,14 @@ export default function AreaCS() {
           <p className="text-brand-bronze mt-1">Gerencie sua lista, filtre contratos e registre atendimentos e tentativas.</p>
         </div>
         <div className="flex gap-3">
+          <button 
+            onClick={handleResetMensal}
+            className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl font-bold shadow-sm hover:bg-red-500 hover:text-white flex items-center gap-2 transition-all"
+            title="Zerar todos os atendimentos e tentativas do mês"
+          >
+            <RotateCcw className="w-5 h-5" />
+            Reset Mensal
+          </button>
           <button 
             onClick={() => setModalNovoCliente(true)}
             className="bg-brand-navy text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-blue-900 flex items-center gap-2 transition-colors"

@@ -380,6 +380,26 @@ def registrar_tentativa(codigo_dj: str, user: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/areacs/reset")
+def reset_mensal(user: str):
+    planilha_path = get_crm_file(user)
+    if not os.path.exists(planilha_path):
+        raise HTTPException(status_code=404, detail="Planilha não encontrada.")
+        
+    try:
+        wb = load_workbook(planilha_path)
+        sheet = wb.active
+        
+        for row_idx in range(2, sheet.max_row + 1):
+            sheet.cell(row=row_idx, column=7, value=0)   # contatos
+            sheet.cell(row=row_idx, column=8, value=0)   # tentativas
+            sheet.cell(row=row_idx, column=10, value="") # ultimo_contato
+                
+        wb.save(planilha_path)
+        return {"message": "Métricas resetadas com sucesso!"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/dashboard/stats")
 def dashboard_stats(user: str):
     if user == "geral":
