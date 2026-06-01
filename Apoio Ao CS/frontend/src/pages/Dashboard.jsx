@@ -274,6 +274,8 @@ export default function Dashboard({ role }) {
                   <select value={novaTarefa.setor} onChange={e => setNovaTarefa({...novaTarefa, setor: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm text-brand-navy dark:text-slate-200 focus:outline-none focus:border-brand-gold">
                     <option>Mediação/Negociação</option>
                     <option>Jurídico</option>
+                    <option>CS</option>
+                    <option>Administrativo</option>
                   </select>
                 </div>
                 <div>
