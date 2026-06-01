@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, Users, User, PhoneForwarded, PieChart, Trash2 } from 'lucide-react';
+import { UploadCloud, Plus, Search, CheckCircle, MessageCircle, Filter, X, Clock, AlertOctagon, AlertTriangle, Users, User, UserPlus, PhoneForwarded, PieChart, Trash2 } from 'lucide-react';
 
 export default function AreaCS() {
   const username = "educrabbe"; 
@@ -12,6 +12,9 @@ export default function AreaCS() {
   
   const [modalQuitar, setModalQuitar] = useState(null);
   const [datasQuitar, setDatasQuitar] = useState({ dataBoleto: '', dataPagamento: '' });
+  
+  const [modalNovoCliente, setModalNovoCliente] = useState(false);
+  const [novoCliente, setNovoCliente] = useState({ id: '', nome: '', uf: 'SP', contrato: 'Veículo', processos: 'Não', criticidade: 'Regular' });
 
   useEffect(() => {
     fetchClientes();
@@ -101,6 +104,37 @@ export default function AreaCS() {
     }
   };
 
+  const handleAddCliente = async () => {
+    if (!novoCliente.id || !novoCliente.nome) {
+      alert("Preencha o ID e o Nome do Cliente");
+      return;
+    }
+    
+    const obj = {
+      ...novoCliente,
+      status: 'Ativo',
+      contatos: 0,
+      tentativas: 0,
+      ultimoContato: null
+    };
+
+    // Otimista
+    setClientes(prev => [obj, ...prev]);
+    setModalNovoCliente(false);
+    setNovoCliente({ id: '', nome: '', uf: 'SP', contrato: 'Veículo', processos: 'Não', criticidade: 'Regular' });
+
+    try {
+      const res = await fetch(`${API_URL}/cliente?user=${username}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(obj)
+      });
+      if (res.ok) fetchClientes();
+    } catch (e) {
+      console.error('Backend offline, cliente adicionado localmente.');
+    }
+  };
+
   const confirmarQuitar = async (e) => {
     e.preventDefault();
     if (!datasQuitar.dataBoleto || !datasQuitar.dataPagamento) return;
@@ -167,6 +201,13 @@ export default function AreaCS() {
           <p className="text-brand-bronze mt-1">Gerencie sua lista, filtre contratos e registre atendimentos e tentativas.</p>
         </div>
         <div className="flex gap-3">
+          <button 
+            onClick={() => setModalNovoCliente(true)}
+            className="bg-brand-navy text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-blue-900 flex items-center gap-2 transition-colors"
+          >
+            <UserPlus className="w-5 h-5 text-brand-gold" />
+            Novo Cliente
+          </button>
           <label className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brand-navy dark:text-white px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 dark:bg-[#0B192C] flex items-center gap-2 transition-colors cursor-pointer">
             <UploadCloud className="w-5 h-5 text-brand-bronze" />
             Importar Planilha
@@ -308,6 +349,15 @@ export default function AreaCS() {
                     
                     <td className="px-4 py-4 text-center">
                       <div className="flex items-center justify-center gap-1">
+                        {cliente.contatos > 0 && !isBlocked && (
+                          <button 
+                            onClick={() => handleDesfazerAtendimento(cliente.id)}
+                            className="p-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
+                            title="Desfazer Atendimento e corrigir conta de premiação"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
                         <button 
                           onClick={() => handleAtendimento(cliente.id)}
                           disabled={isBlocked}
@@ -316,16 +366,6 @@ export default function AreaCS() {
                           <MessageCircle className="w-4 h-4" />
                           {cliente.contatos > 0 ? `Atendido (${cliente.contatos})` : 'Atender'}
                         </button>
-                        
-                        {cliente.contatos > 0 && !isBlocked && (
-                          <button 
-                            onClick={() => handleDesfazerAtendimento(cliente.id)}
-                            className="p-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
-                            title="Desfazer Atendimento (foi clicado por engano)"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        )}
                       </div>
                       {isBlocked && (
                         <p className={`text-[10px] font-bold mt-1 flex items-center justify-center gap-1 ${cliente.contatos >= 6 ? 'text-slate-400' : 'text-amber-600'}`}>
@@ -437,6 +477,89 @@ export default function AreaCS() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Novo Cliente */}
+      {modalNovoCliente && (
+        <div className="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="bg-brand-cream dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 p-4 flex justify-between items-center">
+              <h3 className="font-bold text-brand-navy dark:text-white text-lg flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-brand-gold" />
+                Cadastrar Novo Cliente
+              </h3>
+              <button onClick={() => setModalNovoCliente(false)} className="text-slate-400 hover:text-slate-600 dark:text-slate-300">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">ID DataJuri</label>
+                <input 
+                  type="text"
+                  placeholder="Ex: DJ-12345"
+                  value={novoCliente.id}
+                  onChange={e => setNovoCliente({...novoCliente, id: e.target.value})}
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-brand-navy transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">Nome Completo</label>
+                <input 
+                  type="text"
+                  placeholder="Nome do Cliente"
+                  value={novoCliente.nome}
+                  onChange={e => setNovoCliente({...novoCliente, nome: e.target.value})}
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-brand-navy transition-colors"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">UF</label>
+                  <input 
+                    type="text"
+                    placeholder="Ex: SP"
+                    maxLength={2}
+                    value={novoCliente.uf}
+                    onChange={e => setNovoCliente({...novoCliente, uf: e.target.value.toUpperCase()})}
+                    className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-brand-navy transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">Contrato</label>
+                  <select 
+                    value={novoCliente.contrato}
+                    onChange={e => setNovoCliente({...novoCliente, contrato: e.target.value})}
+                    className="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 rounded-lg p-2.5 text-slate-700 focus:outline-none focus:border-brand-navy transition-colors"
+                  >
+                    <option value="Veículo">Veículo</option>
+                    <option value="Empréstimo">Empréstimo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setModalNovoCliente(false)}
+                  className="flex-1 bg-slate-100 text-slate-600 dark:text-slate-300 dark:bg-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="button" 
+                  onClick={handleAddCliente}
+                  className="flex-1 bg-brand-navy text-white font-bold py-3 rounded-xl hover:bg-blue-900 shadow-md transition-colors"
+                >
+                  Confirmar Cadastro
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
