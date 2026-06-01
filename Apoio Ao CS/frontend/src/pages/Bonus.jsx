@@ -92,9 +92,6 @@ export default function Bonus({ role }) {
                         />
                         <tipo.icon className={`w-4 h-4 flex-shrink-0 ${form.tipo === tipo.id ? 'text-brand-gold' : ''}`} />
                         <span className="text-sm font-medium flex-1">{tipo.label}</span>
-                        <span className="text-xs font-bold bg-white/10 px-2 py-1 rounded">
-                          R$ {isHighLevel ? tipo.valor35.toFixed(2) : tipo.valor12.toFixed(2)}
-                        </span>
                       </label>
                     ))}
                   </div>
