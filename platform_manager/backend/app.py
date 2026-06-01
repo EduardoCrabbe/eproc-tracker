@@ -401,34 +401,45 @@ def reset_mensal(user: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/dashboard/stats")
-def dashboard_stats(user: str):
-    if user == "geral":
-        arquivos = [f for f in os.listdir(UPLOADS_DIR) if f.startswith("atendimentos_") and f.endswith(".xlsx")]
-    else:
-        planilha_path = get_crm_file(user)
-        if not os.path.exists(planilha_path):
-            arquivos = []
-        else:
-            arquivos = [f"atendimentos_{user}.xlsx"]
-            
-    if not arquivos:
-        return {
-            "naoAtendidos": 0, "naoAtendidosPct": 0,
-            "tentativas": 0,
-            "atendidos": 0, "atendidosPct": 0,
-            "ganhosTotais": 0,
-            "prioridades": []
-        }
-        
+def dashboard_stats(user: str, csLevels: str = Query(None)):
     try:
+        levels_map = {}
+        if csLevels:
+            import json
+            try:
+                levels_map = json.loads(csLevels)
+            except Exception:
+                pass
+
+        if user == "geral":
+            arquivos = [f for f in os.listdir(UPLOADS_DIR) if f.startswith("atendimentos_") and f.endswith(".xlsx")]
+        else:
+            planilha_path = get_crm_file(user)
+            if not os.path.exists(planilha_path):
+                arquivos = []
+            else:
+                arquivos = [f"atendimentos_{user}.xlsx"]
+            
+        if not arquivos:
+            return {
+                "naoAtendidos": 0, "naoAtendidosPct": 0,
+                "tentativas": 0,
+                "atendidos": 0, "atendidosPct": 0,
+                "ganhosTotais": 0,
+                "prioridades": []
+            }
+        
         total_clientes = 0
         atendidos = 0
         tentativas_totais = 0
         prioridades = []
         ganhos_totais = 0.0
-        VALOR_COMISSAO_POR_ATENDIMENTO = 5.00 # Exemplo: 5 reais por atendimento
 
         for arquivo in arquivos:
+            nome_cs = arquivo.replace("atendimentos_", "").replace(".xlsx", "")
+            nivel = int(levels_map.get(nome_cs, 1))
+            valor_comissao = 1.00 if nivel <= 2 else 1.50
+            
             wb = load_workbook(os.path.join(UPLOADS_DIR, arquivo), data_only=True)
             sheet = wb.active
         
@@ -450,7 +461,7 @@ def dashboard_stats(user: str):
                 
                 if contatos > 0:
                     atendidos += 1
-                    ganhos_totais += (contatos * VALOR_COMISSAO_POR_ATENDIMENTO)
+                    ganhos_totais += (contatos * valor_comissao)
                 elif tentativas > 0:
                     tentativas_totais += 1
                     

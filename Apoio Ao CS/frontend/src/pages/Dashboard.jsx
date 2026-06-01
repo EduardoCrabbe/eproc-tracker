@@ -49,7 +49,14 @@ export default function Dashboard({ role }) {
   const fetchStats = async () => {
     try {
       const fetchUser = isManager ? 'geral' : username;
-      const res = await fetch(`${API_URL}?user=${fetchUser}`);
+      const equipe = JSON.parse(localStorage.getItem('equipeCS') || '[]');
+      const csLevels = equipe.reduce((acc, curr) => {
+        const normalized = curr.nome.toLowerCase().replace(/\s+/g, '');
+        acc[normalized] = curr.nivel;
+        return acc;
+      }, {});
+      
+      const res = await fetch(`${API_URL}?user=${fetchUser}&csLevels=${encodeURIComponent(JSON.stringify(csLevels))}`);
       if (res.ok) {
         const data = await res.json();
         setStats(data);
