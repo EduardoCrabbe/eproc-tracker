@@ -14,13 +14,13 @@ A identidade e segurança dos dados são fundamentais na aplicação.
 ## 3. Tabela de Comissionamento Automático
 O backend calculará a comissão automaticamente com base no tipo de evento e no `level_cs` registrado no banco.
 
-| Tipo de Ação | CS Níveis 1 e 2 | CS Níveis 3, 4 e 5 |
-| :--- | :--- | :--- |
-| **Quitação** | R$ 5,00 | R$ 10,00 |
-| **Comentário Google (Positivo)** | R$ 5,00 | R$ 10,00 |
-| **Foto com Boleto (Quitação)** | R$ 5,00 | R$ 10,00 |
-| **Reclame Aqui (Comentário Positivo)** | R$ 10,00 | R$ 15,00 |
-| **Depoimento por Vídeo**| R$ 15,00 | R$ 20,00 |
+| Tipo de Ação                           | CS Níveis 1 e 2 | CS Níveis 3, 4 e 5 |
+| :------------------------------------- | :-------------- | :----------------- |
+| **Quitação**                           | R$ 5,00         | R$ 10,00           |
+| **Comentário Google (Positivo)**       | R$ 5,00         | R$ 10,00           |
+| **Foto com Boleto (Quitação)**         | R$ 5,00         | R$ 10,00           |
+| **Reclame Aqui (Comentário Positivo)** | R$ 10,00        | R$ 15,00           |
+| **Depoimento por Vídeo**               | R$ 15,00        | R$ 20,00           |
 
 ## 4. IA e Resumos (Gemini)
 - Quando o atendimento ocorrer via chamada de vídeo, ligação telefônica ou de forma presencial, o CS irá submeter um **áudio ou vídeo gravado** do atendimento na plataforma.

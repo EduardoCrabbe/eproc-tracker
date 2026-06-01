@@ -9,22 +9,25 @@ export default function Bonus({ role }) {
     { data: '26/05/2026', cs: 'Ana Souza', cliente: 'Maria Oliveira', tipo: 'Vídeo Depoimento', valor: 15.00 }
   ]);
 
-  const [form, setForm] = useState({ cliente: '', tipo: 'ComentarioQuitacao' });
+  const [form, setForm] = useState({ cliente: '', tipo: 'Quitacao', nivel: '1-2' });
 
   const tiposBonus = [
-    { id: 'ComentarioQuitacao', label: 'Comentário / Quitação', icon: MessageSquare },
-    { id: 'ReclameAqui', label: 'Elogio no Reclame Aqui', icon: Star },
-    { id: 'FotoBoleto', label: 'Foto com Boleto Pago', icon: ImageIcon },
-    { id: 'VideoDepoimento', label: 'Vídeo Depoimento', icon: Video }
+    { id: 'Quitacao', label: 'Quitação', icon: MessageSquare, valor12: 5.00, valor35: 10.00 },
+    { id: 'ComentarioGoogle', label: 'Comentário Google (Positivo)', icon: Star, valor12: 5.00, valor35: 10.00 },
+    { id: 'FotoBoleto', label: 'Foto com Boleto (Quitação)', icon: ImageIcon, valor12: 5.00, valor35: 10.00 },
+    { id: 'ReclameAqui', label: 'Reclame Aqui (Positivo)', icon: Star, valor12: 10.00, valor35: 15.00 },
+    { id: 'VideoDepoimento', label: 'Depoimento por Vídeo', icon: Video, valor12: 15.00, valor35: 20.00 }
   ];
 
   const handleLancamento = (e) => {
     e.preventDefault();
     if (!form.cliente) return;
-    
+    const tipoSelecionado = tiposBonus.find(t => t.id === form.tipo);
+    const valorCalculado = form.nivel === '1-2' ? tipoSelecionado.valor12 : tipoSelecionado.valor35;
+
     // Simulating frontend adding to extrato (Mocking API call)
     setExtrato([
-      { data: new Date().toLocaleDateString('pt-BR'), cs: 'Edu crabbe', cliente: form.cliente, tipo: form.tipo, valor: 0 },
+      { data: new Date().toLocaleDateString('pt-BR'), cs: 'Edu crabbe', cliente: form.cliente, tipo: tipoSelecionado.label, valor: valorCalculado },
       ...extrato
     ]);
     setForm({ ...form, cliente: '' });
@@ -70,10 +73,27 @@ export default function Bonus({ role }) {
                           onChange={() => setForm({...form, tipo: tipo.id})}
                           className="hidden"
                         />
-                        <tipo.icon className={`w-4 h-4 ${form.tipo === tipo.id ? 'text-brand-gold' : ''}`} />
-                        <span className="text-sm font-medium">{tipo.label}</span>
+                        <tipo.icon className={`w-4 h-4 flex-shrink-0 ${form.tipo === tipo.id ? 'text-brand-gold' : ''}`} />
+                        <span className="text-sm font-medium flex-1">{tipo.label}</span>
+                        <span className="text-xs font-bold bg-white/10 px-2 py-1 rounded">
+                          R$ {form.nivel === '1-2' ? tipo.valor12.toFixed(2) : tipo.valor35.toFixed(2)}
+                        </span>
                       </label>
                     ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-2 mt-4">Nível do CS</label>
+                  <div className="flex gap-4">
+                    <label className={`flex-1 text-center py-2 rounded-lg border cursor-pointer transition-colors ${form.nivel === '1-2' ? 'bg-brand-gold/20 border-brand-gold text-white' : 'border-white/10 text-white/60 hover:bg-white/5'}`}>
+                      <input type="radio" name="nivelCS" value="1-2" checked={form.nivel === '1-2'} onChange={() => setForm({...form, nivel: '1-2'})} className="hidden" />
+                      <span className="text-sm font-bold">Níveis 1 e 2</span>
+                    </label>
+                    <label className={`flex-1 text-center py-2 rounded-lg border cursor-pointer transition-colors ${form.nivel === '3-5' ? 'bg-brand-gold/20 border-brand-gold text-white' : 'border-white/10 text-white/60 hover:bg-white/5'}`}>
+                      <input type="radio" name="nivelCS" value="3-5" checked={form.nivel === '3-5'} onChange={() => setForm({...form, nivel: '3-5'})} className="hidden" />
+                      <span className="text-sm font-bold">Níveis 3, 4 e 5</span>
+                    </label>
                   </div>
                 </div>
 
