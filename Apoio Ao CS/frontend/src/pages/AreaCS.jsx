@@ -70,7 +70,7 @@ export default function AreaCS() {
 
   const handleDesfazerAtendimento = async (id) => {
     // Atualização otimista para a apresentação
-    setClientes(prev => prev.map(c => c.id === id ? { ...c, contatos: Math.max(0, (c.contatos || 0) - 1) } : c));
+    setClientes(prev => prev.map(c => c.id === id ? { ...c, contatos: Math.max(0, (c.contatos || 0) - 1), ultimoContato: null } : c));
     try {
       const res = await fetch(`${API_URL}/atendimento/${id}?user=${username}`, { method: "DELETE" });
       if (res.ok) fetchClientes();
