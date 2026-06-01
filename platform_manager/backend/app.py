@@ -294,6 +294,7 @@ def desfazer_atendimento(codigo_dj: str, user: str):
                 contatos = int(contatos) if contatos is not None else 0
                 if contatos > 0:
                     sheet.cell(row=row_idx, column=7, value=contatos - 1)
+                    sheet.cell(row=row_idx, column=10, value="")
                 atualizado = True
                 break
                 
