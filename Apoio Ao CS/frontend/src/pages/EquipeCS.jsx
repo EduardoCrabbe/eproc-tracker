@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, TrendingUp, Award, UserPlus, X } from 'lucide-react';
+import { Users, TrendingUp, Award, UserPlus, X, Trash2 } from 'lucide-react';
 
 export default function EquipeCS() {
   const [equipe, setEquipe] = useState([]);
@@ -44,6 +44,14 @@ export default function EquipeCS() {
     localStorage.setItem('equipeCS', JSON.stringify(updatedEquipe));
     setIsModalOpen(false);
     setNovoCS({ nome: '', email: '', nivel: 1 });
+  };
+
+  const handleDeleteCS = (id) => {
+    if (window.confirm("Tem certeza que deseja excluir este CS da equipe?")) {
+      const updatedEquipe = equipe.filter(cs => cs.id !== id);
+      setEquipe(updatedEquipe);
+      localStorage.setItem('equipeCS', JSON.stringify(updatedEquipe));
+    }
   };
 
   return (
@@ -140,8 +148,11 @@ export default function EquipeCS() {
                     {cs.comentarios}
                   </td>
                   <td className="px-6 py-4 text-sm font-bold text-brand-navy dark:text-white text-right">R$ {cs.ganhos.toFixed(2)}</td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 flex items-center justify-end gap-3 mt-1">
                     <button onClick={() => alert('Redirecionando para planilha detalhada do CS...')} className="text-sm text-brand-bronze hover:text-brand-navy font-bold underline">Ver Planilha</button>
+                    <button onClick={() => handleDeleteCS(cs.id)} className="text-red-400 hover:text-red-600 transition-colors p-1" title="Excluir CS">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </td>
                 </tr>
               );
