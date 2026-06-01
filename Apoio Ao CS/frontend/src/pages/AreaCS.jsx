@@ -351,8 +351,8 @@ export default function AreaCS() {
                       <div className="flex items-center justify-center gap-1">
                         <button 
                           onClick={() => handleDesfazerAtendimento(cliente.id)}
-                          disabled={cliente.contatos === 0 || isBlocked}
-                          className={`p-1.5 rounded-lg border transition-colors ${cliente.contatos > 0 && !isBlocked ? 'border-red-200 text-red-500 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30' : 'border-slate-100 text-slate-300 dark:border-slate-700 dark:text-slate-600 cursor-not-allowed'}`}
+                          disabled={cliente.contatos === 0}
+                          className={`p-1.5 rounded-lg border transition-colors ${cliente.contatos > 0 ? 'border-red-200 text-red-500 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30' : 'border-slate-100 text-slate-300 dark:border-slate-700 dark:text-slate-600 cursor-not-allowed'}`}
                           title="Desfazer Atendimento e corrigir conta de premiação"
                         >
                           <X className="w-4 h-4" />
