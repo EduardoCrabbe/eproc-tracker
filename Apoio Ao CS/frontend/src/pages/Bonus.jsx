@@ -9,7 +9,7 @@ export default function Bonus({ role }) {
     { data: '26/05/2026', cs: 'Ana Souza', cliente: 'Maria Oliveira', tipo: 'Vídeo Depoimento', valor: 15.00 }
   ]);
 
-  const [form, setForm] = useState({ cliente: '', tipo: 'Quitacao', nivel: '1-2' });
+  const [form, setForm] = useState({ cliente: '', tipo: 'Quitacao' });
 
   const tiposBonus = [
     { id: 'Quitacao', label: 'Quitação', icon: MessageSquare, valor12: 5.00, valor35: 10.00 },
@@ -22,8 +22,18 @@ export default function Bonus({ role }) {
   const handleLancamento = (e) => {
     e.preventDefault();
     if (!form.cliente) return;
+    
+    // Na fase de testes, o usuário logado é o Edu crabbe
+    const loggedInUser = 'Edu crabbe';
+    
+    // Buscar o nível do CS no "banco de dados" (localStorage configurado pelo gerente)
+    const equipe = JSON.parse(localStorage.getItem('equipeCS') || '[]');
+    const csData = equipe.find(cs => cs.nome === loggedInUser);
+    const nivelCS = csData ? csData.nivel : 1; // Default para nível 1 se não achar
+    
+    const isHighLevel = nivelCS >= 3;
     const tipoSelecionado = tiposBonus.find(t => t.id === form.tipo);
-    const valorCalculado = form.nivel === '1-2' ? tipoSelecionado.valor12 : tipoSelecionado.valor35;
+    const valorCalculado = isHighLevel ? tipoSelecionado.valor35 : tipoSelecionado.valor12;
 
     // Simulating frontend adding to extrato (Mocking API call)
     setExtrato([
@@ -32,6 +42,13 @@ export default function Bonus({ role }) {
     ]);
     setForm({ ...form, cliente: '' });
   };
+
+  // Pegar nível do CS atual para mostrar apenas o valor real que ele tem direito
+  const loggedInUser = 'Edu crabbe';
+  const equipe = JSON.parse(localStorage.getItem('equipeCS') || '[]');
+  const csData = equipe.find(cs => cs.nome === loggedInUser);
+  const nivelCS = csData ? csData.nivel : 1;
+  const isHighLevel = nivelCS >= 3;
 
   return (
     <div className="space-y-8">
@@ -76,24 +93,10 @@ export default function Bonus({ role }) {
                         <tipo.icon className={`w-4 h-4 flex-shrink-0 ${form.tipo === tipo.id ? 'text-brand-gold' : ''}`} />
                         <span className="text-sm font-medium flex-1">{tipo.label}</span>
                         <span className="text-xs font-bold bg-white/10 px-2 py-1 rounded">
-                          R$ {form.nivel === '1-2' ? tipo.valor12.toFixed(2) : tipo.valor35.toFixed(2)}
+                          R$ {isHighLevel ? tipo.valor35.toFixed(2) : tipo.valor12.toFixed(2)}
                         </span>
                       </label>
                     ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-2 mt-4">Nível do CS</label>
-                  <div className="flex gap-4">
-                    <label className={`flex-1 text-center py-2 rounded-lg border cursor-pointer transition-colors ${form.nivel === '1-2' ? 'bg-brand-gold/20 border-brand-gold text-white' : 'border-white/10 text-white/60 hover:bg-white/5'}`}>
-                      <input type="radio" name="nivelCS" value="1-2" checked={form.nivel === '1-2'} onChange={() => setForm({...form, nivel: '1-2'})} className="hidden" />
-                      <span className="text-sm font-bold">Níveis 1 e 2</span>
-                    </label>
-                    <label className={`flex-1 text-center py-2 rounded-lg border cursor-pointer transition-colors ${form.nivel === '3-5' ? 'bg-brand-gold/20 border-brand-gold text-white' : 'border-white/10 text-white/60 hover:bg-white/5'}`}>
-                      <input type="radio" name="nivelCS" value="3-5" checked={form.nivel === '3-5'} onChange={() => setForm({...form, nivel: '3-5'})} className="hidden" />
-                      <span className="text-sm font-bold">Níveis 3, 4 e 5</span>
-                    </label>
                   </div>
                 </div>
 
