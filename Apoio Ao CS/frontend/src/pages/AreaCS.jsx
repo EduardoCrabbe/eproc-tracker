@@ -183,7 +183,9 @@ export default function AreaCS() {
   // Calculos da Tela Area CS
   const totalAtivos = clientes.filter(c => c.status === 'Ativo').length;
   const atendidos = clientes.filter(c => c.status === 'Ativo' && c.contatos > 0).length;
-  const naoAtendidos = totalAtivos - atendidos;
+  const emTentativa = clientes.filter(c => c.status === 'Ativo' && c.contatos === 0 && c.tentativas > 0).length;
+  const naoAtendidos = totalAtivos - atendidos - emTentativa;
+  
   const pctAtendidos = totalAtivos > 0 ? Math.round((atendidos / totalAtivos) * 100) : 0;
   const pctNaoAtendidos = totalAtivos > 0 ? Math.round((naoAtendidos / totalAtivos) * 100) : 0;
 
@@ -217,7 +219,7 @@ export default function AreaCS() {
       </header>
 
       {/* Mini-Dashboard AreaCS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
           <div className="p-3 bg-blue-50 text-blue-500 rounded-lg"><Users className="w-5 h-5" /></div>
           <div>
@@ -233,16 +235,23 @@ export default function AreaCS() {
           </div>
         </div>
         <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+          <div className="p-3 bg-orange-50 text-orange-500 rounded-lg"><PhoneForwarded className="w-5 h-5" /></div>
+          <div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Tentativas</p>
+            <p className="text-2xl font-black text-orange-600">{emTentativa}</p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
           <div className="p-3 bg-rose-50 text-rose-500 rounded-lg"><AlertOctagon className="w-5 h-5" /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Não Atendidos</p>
             <p className="text-2xl font-black text-rose-600">{naoAtendidos} <span className="text-sm font-medium text-slate-400">({pctNaoAtendidos}%)</span></p>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center col-span-2 md:col-span-1">
           <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-2">Progresso da Base</p>
           <div className="w-full bg-slate-100 rounded-full h-2.5">
-            <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: `${pctAtendidos}%` }}></div>
+            <div className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style={{ width: `${pctAtendidos}%` }}></div>
           </div>
         </div>
       </div>
