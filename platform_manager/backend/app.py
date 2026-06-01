@@ -455,11 +455,14 @@ def dashboard_stats(user: str):
                     ganhos_totais += (contatos * VALOR_COMISSAO_POR_ATENDIMENTO)
                     
                 if criticidade in ["Crítico", "Atenção"]:
+                    # Extrair o nome do CS do arquivo (ex: atendimentos_educrabbe.xlsx -> educrabbe)
+                    nome_cs = arquivo.replace("atendimentos_", "").replace(".xlsx", "")
                     prioridades.append({
                         "id": codigo_dj,
                         "nome": nome,
                         "criticidade": criticidade,
-                        "ultimoContato": ultimo_contato
+                        "ultimoContato": ultimo_contato,
+                        "cs": nome_cs
                     })
                 
         nao_atendidos = total_clientes - atendidos

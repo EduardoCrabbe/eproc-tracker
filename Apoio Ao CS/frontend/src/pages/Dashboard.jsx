@@ -245,10 +245,19 @@ export default function Dashboard({ role }) {
                 return (
                   <div key={item.id} className={`bg-white dark:bg-[#112240] p-4 rounded-xl shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-slate-100 dark:border-slate-800 flex justify-between items-center`}>
                     <div>
-                      <h4 className="font-bold text-brand-navy dark:text-white">{item.nome}</h4>
-                      <span className={`text-xs font-bold uppercase ${item.criticidade === 'Crítico' ? 'text-red-500' : 'text-amber-500'}`}>
-                        {item.criticidade} ({item.criticidade === 'Crítico' ? 'Semanal' : 'Quinzenal'})
-                      </span>
+                      <h4 className="font-bold text-brand-navy dark:text-white flex items-center gap-2">
+                        {item.nome}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-xs font-bold uppercase ${item.criticidade === 'Crítico' ? 'text-red-500' : 'text-amber-500'}`}>
+                          {item.criticidade} ({item.criticidade === 'Crítico' ? 'Semanal' : 'Quinzenal'})
+                        </span>
+                        {isManager && item.cs && (
+                          <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded-full font-bold">
+                            CS: {item.cs}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="text-right">
                       <div className={`text-sm font-black ${statusColor}`}>
@@ -303,21 +312,30 @@ export default function Dashboard({ role }) {
                 <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></div>
                 <span className="font-bold text-slate-600 dark:text-slate-300">Atendidos</span>
               </div>
-              <span className="font-black text-emerald-500">{stats.atendidos}</span>
+              <div className="text-right">
+                <span className="font-black text-emerald-500 mr-2">{stats.atendidos}</span>
+                <span className="text-xs font-bold text-slate-400">({stats.atendidosPct}%)</span>
+              </div>
             </div>
             <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500 shadow-sm"></div>
                 <span className="font-bold text-slate-600 dark:text-slate-300">Tentativas</span>
               </div>
-              <span className="font-black text-orange-500">{stats.tentativas}</span>
+              <div className="text-right">
+                <span className="font-black text-orange-500 mr-2">{stats.tentativas}</span>
+                <span className="text-xs font-bold text-slate-400">({totalChart > 0 ? ((stats.tentativas / totalChart) * 100).toFixed(1) : 0}%)</span>
+              </div>
             </div>
             <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div>
                 <span className="font-bold text-slate-600 dark:text-slate-300">Não Atendidos</span>
               </div>
-              <span className="font-black text-red-500">{stats.naoAtendidos}</span>
+              <div className="text-right">
+                <span className="font-black text-red-500 mr-2">{stats.naoAtendidos}</span>
+                <span className="text-xs font-bold text-slate-400">({stats.naoAtendidosPct}%)</span>
+              </div>
             </div>
           </div>
         </div>
