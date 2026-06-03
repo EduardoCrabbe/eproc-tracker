@@ -5,6 +5,7 @@ from openpyxl import load_workbook, Workbook
 import os
 import sys
 import threading
+import multiprocessing
 
 if getattr(sys, 'frozen', False):
     # Se for o executável compilado, BASE_DIR é a pasta onde o .exe está
@@ -503,33 +504,33 @@ def dashboard_stats(user: str, csLevels: str = Query(None)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
+def run_server():
     import uvicorn
-    import webbrowser
-    import threading
-    import time
-    from fastapi.staticfiles import StaticFiles
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
-    # Determinar caminho base correto para PyInstaller (sys._MEIPASS) ou modo Dev
-    if getattr(sys, 'frozen', False):
-        base_dir = sys._MEIPASS
-    else:
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        
-    dist_dir = os.path.join(base_dir, "dist")
+if __name__ == "__main__":
+    multiprocessing.freeze_support()  # CRUCIAL para o undetected_chromedriver funcionar dentro de um .exe
     
-    # Se a pasta dist existir (compilação React), monta no root
-    if os.path.exists(dist_dir):
-        app.mount("/", StaticFiles(directory=dist_dir, html=True), name="static")
-
-    def open_browser():
-        time.sleep(1.5)
-        webbrowser.open("http://127.0.0.1:8000")
-
-    if getattr(sys, 'frozen', False):
-        # Modo EXE: não use reload, abra o navegador
+    import threading
+    
+    # Se estiver rodando como executável (.exe) ou se preferir rodar como app nativo sempre:
+    try:
+        import webview
+        # Inicia o servidor em segundo plano
+        server_thread = threading.Thread(target=run_server, daemon=True)
+        server_thread.start()
+        
+        # Cria a janela do aplicativo apontando para a porta do servidor
+        webview.create_window('Eproc Tracker - Apoio ao CS', 'http://127.0.0.1:8000', width=1280, height=800, text_select=True)
+        webview.start()
+    except ImportError:
+        # Fallback caso rode sem a biblioteca pywebview no modo desenvolvimento
+        import webbrowser
+        import time
+        import uvicorn
+        def open_browser():
+            time.sleep(1.5)
+            webbrowser.open("http://127.0.0.1:8000")
+            
         threading.Thread(target=open_browser, daemon=True).start()
         uvicorn.run(app, host="0.0.0.0", port=8000)
-    else:
-        # Modo Dev: use reload
-        uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
