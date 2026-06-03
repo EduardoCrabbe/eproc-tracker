@@ -508,6 +508,20 @@ def run_server():
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
+from fastapi.staticfiles import StaticFiles
+
+# Determinar caminho base correto para PyInstaller (sys._MEIPASS) ou modo Dev
+if getattr(sys, 'frozen', False):
+    base_dir = sys._MEIPASS
+else:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    
+dist_dir = os.path.join(base_dir, "dist")
+
+# Se a pasta dist existir (compilação React), monta no root
+if os.path.exists(dist_dir):
+    app.mount("/", StaticFiles(directory=dist_dir, html=True), name="static")
+
 if __name__ == "__main__":
     multiprocessing.freeze_support()  # CRUCIAL para o undetected_chromedriver funcionar dentro de um .exe
     

@@ -26,8 +26,8 @@ class EprocScraper:
         opcoes.add_argument("--disable-notifications")
 
         # Inicializa o driver com o undetected_chromedriver e suporte nativo a headless
-        # Especificamos version_main=147 para parear com a versão instalada no PC
-        self.driver = uc.Chrome(options=opcoes, headless=self.headless, version_main=147)
+        # Removemos o version_main fixo para que ele se adapte a qualquer versão instalada no PC do trabalho
+        self.driver = uc.Chrome(options=opcoes, headless=self.headless)
         
         # Timeout global implícito de 10 segundos
         self.driver.implicitly_wait(10)
